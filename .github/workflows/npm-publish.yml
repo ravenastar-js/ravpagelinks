@@ -106,7 +106,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.next_version.outputs.new_version }}
-          name: "🕷️ RavPageLinks v${{ steps.next_version.outputs.new_version }}"
+          name: "🌱 v${{ steps.next_version.outputs.new_version }}"
           body: |
             ## 🚀 RavPageLinks Publicado!
             
