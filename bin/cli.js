@@ -16,7 +16,7 @@ const fs = require('fs');
  */
 function showBanner() {
     console.log(
-        chalk.cyan(
+        chalk.greenBright(
             figlet.textSync('RavPageLinks', {
                 font: 'Small Slant',
                 horizontalLayout: 'default',
@@ -29,11 +29,10 @@ function showBanner() {
         padding: 1,
         margin: 1,
         borderStyle: 'round',
-        borderColor: 'cyan',
-        backgroundColor: '#555555'
+        borderColor: 'greenBright'
     };
 
-    const welcomeText = chalk.white.bold('🚀 Ferramenta de Enumeração de URLs\n') +
+    const welcomeText = chalk.white.bold('🚀 Ferramenta de Enumeração de URLs\n\n') +
         chalk.white('📝 Extrai URLs de páginas web com renderização JavaScript\n') +
         chalk.white('🔧 Múltiplos métodos de extração e filtros\n') +
         chalk.white('📊 Logs opcionais e relatórios detalhados');
@@ -181,7 +180,7 @@ async function main() {
             logger.file(`Diretório de saída: ${chalk.blue(outputDir)}`);
             logger.time(`Timeout: ${chalk.yellow(timeout + 'ms')}`);
         } else {
-            console.log(chalk.blue('🚀 Iniciando enumeração de URLs:'), chalk.cyan(url));
+            console.log(chalk.white.bold('🚀 Iniciando enumeração de URLs:'), chalk.cyan(url));
         }
 
         let filterConfig = {};
@@ -192,7 +191,7 @@ async function main() {
             if (logger) {
                 logger.filter(`Usando arquivo de filtro: ${chalk.magenta(filterFile)}`);
             } else {
-                console.log(chalk.magenta('🔧 Usando arquivo de filtro:'), filterFile);
+                console.log(chalk.white.bold('🔧 Usando arquivo de filtro:'), chalk.magentaBright(filterFile));
             }
 
             if (!fs.existsSync(filterFile)) {
@@ -294,11 +293,11 @@ async function main() {
 
         if (!fs.existsSync(domainDir)) {
             fs.mkdirSync(domainDir, { recursive: true });
-            const dirMsg = `Diretório criado: ${chalk.blue(domainDir)}`;
+            const dirMsg = `Diretório criado: ${chalk.yellowBright(domainDir)}`;
             if (logger) {
                 logger.file(dirMsg);
             } else {
-                console.log(chalk.blue('📁 ' + dirMsg));
+                console.log(chalk.yellowBright('📁 ' + dirMsg));
             }
         }
 
@@ -332,11 +331,11 @@ async function main() {
             logger.file(`URLs salvas em: ${chalk.blue(outputFile)}`);
             logger.endSession();
         } else {
-            console.log(chalk.green('✅ Enumeração de URLs concluída com sucesso!'));
-            console.log(chalk.blue('📊 Estatísticas:'));
+            console.log(chalk.greenBright('✅ Enumeração de URLs concluída com sucesso!'));
+            console.log(chalk.white.bold('📊 Estatísticas:'));
             console.log(`   • URLs encontradas: ${chalk.cyan(links.length)}`);
             console.log(`   • Tempo de execução: ${chalk.yellow(duration + 'ms')}`);
-            console.log(`   • Arquivo salvo: ${chalk.blue(outputFile)}`);
+            console.log(`   • Arquivo salvo: ${chalk.cyan(outputFile)}`);
             if (filterConfig.type) {
                 console.log(`   • Filtro aplicado: ${chalk.magenta(filterConfig.type)}`);
             }
