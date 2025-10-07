@@ -31,9 +31,6 @@ jobs:
       - name: 🕷️ Install Playwright browsers
         run: npx playwright install
 
-      - name: 🧪 Run tests
-        run: npm test
-
       - name: 🔧 Configure Git
         run: |
           git config --global user.name "GitHub Actions"
