@@ -3,11 +3,11 @@
 <a href="https://www.npmjs.com/package/ravpagelinks" target="_blank"><img src="https://img.shields.io/badge/-ravpagelinks-c40404?style=flat-square&labelColor=c40404&logo=npm&logoColor=white&link=https://www.npmjs.com/package/ravpagelinks" height="40" /></a>  
  <a href="https://www.npmjs.com/package/ravpagelinks" target="_blank"><img alt="NPM Version" src="https://img.shields.io/npm/v/ravpagelinks?style=flat-square&logo=npm&labelColor=c40404&color=c40404" height="40" ></a>
 
-<div>
+
 
 ---
 
-<div align="center">
+
 
 # 🚀 RavPageLinks  
 ### 🕷️ Ferramenta básica de Enumeração de URLs em Páginas Web
@@ -22,7 +22,7 @@
 
 *Biblioteca NPM + CLI para extração de URL automática*
 
-</div>
+
 
 ![RavPageLinks](media/ravpagelinks.png)
 
@@ -32,10 +32,12 @@ BANNER INSPIRADO EM
 <a href="https://store.steampowered.com/app/1507580/Enigma_do_Medo" >
   <img src="https://i.imgur.com/Gbyx94i.png" width="180">
 </a>
-
 </div>
 
+
 ---
+
+</div>
 
 ## 📞 Suporte 
 
@@ -44,7 +46,6 @@ Se precisar de ajuda ou quiser falar com a equipe, entre no nosso servidor de su
 [![Servidor de Suporte](https://img.shields.io/badge/Servidor%20de%20Suporte-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/FncVNprdgP)
 
 ---
-
 
 
 ## 📋 Índice
@@ -57,6 +58,7 @@ Se precisar de ajuda ou quiser falar com a equipe, entre no nosso servidor de su
 - [🚀 Exemplos Práticos](#-exemplos-práticos)
 - [🔍 Estrutura Técnica](#-estrutura-técnica)
 - [🐛 Solução de Problemas](#-solução-de-problemas)
+
 
 ## 🎯 Visão Geral
 
