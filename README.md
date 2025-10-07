@@ -75,13 +75,22 @@ O **RavPageLinks** é uma ferramenta básica de enumeração de URLs que combina
 
 ```bash
 # Instalar globalmente
-npm install -g ravpagelinks
+npm i -g ravpagelinks          # ✅ Recomendado
+npm install -g ravpagelinks    # ✅ Completo
 
 # Ou usar diretamente com npx
 npx ravpagelinks https://secguide.pages.dev/ferramentas
 
 # Instalar navegadores do Playwright
 npx ravpagelinks --dw-nav
+```
+
+## 🗑️ DESINSTALAR GLOBALMENTE
+
+```bash
+npm un -g ravpagelinks         # ✅ Recomendado  
+npm uninstall -g ravpagelinks  # ✅ Completo
+npm remove -g ravpagelinks     # ✅ Alternativo
 ```
 
 ## 🛠️ Como Usar
