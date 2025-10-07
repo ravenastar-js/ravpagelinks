@@ -1,6 +1,6 @@
 {
     "name": "ravpagelinks",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "🕷️ Ferramenta básica de Enumeração de URLs em Páginas Web.",
     "main": "index.js",
     "bin": {
