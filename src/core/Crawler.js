@@ -18,6 +18,7 @@ class RavPageLinks {
      * @param {boolean} options.deepScan - 🔍 Escaneamento profundo
      * @param {boolean} options.usePlaywright - 🌐 Usar Playwright
      * @param {Object} options.playwrightOptions - ⚙️ Opções do Playwright
+     * @param {boolean} options.enableLogs - 📝 Habilitar sistema de logs
      */
     constructor(options = {}) {
         this.options = {
@@ -27,6 +28,7 @@ class RavPageLinks {
             deepScan: true,
             usePlaywright: true,
             playwrightOptions: {},
+            enableLogs: false,
             ...options
         };
 
@@ -36,11 +38,12 @@ class RavPageLinks {
             ...this.options.playwrightOptions
         }) : null;
         this.filterManager = new FilterManager();
-        this.logger = new AdvancedLogger({
+        
+        this.logger = this.options.enableLogs ? new AdvancedLogger({
             verbose: this.options.verbose,
             colors: true,
             timestamp: true
-        });
+        }) : null;
     }
 
     /**
@@ -65,40 +68,56 @@ class RavPageLinks {
         } = options;
 
         try {
-            this.logger.info(`Iniciando crawling em: ${url}`);
+            if (this.logger) {
+                this.logger.info(`Iniciando crawling em: ${url}`);
+            }
 
             let links;
 
             if (usePlaywright && this.playwrightCrawler) {
-                this.logger.info('Usando Playwright para renderização JavaScript...');
+                if (this.logger) {
+                    this.logger.info('Usando Playwright para renderização JavaScript...');
+                }
                 links = await this.playwrightCrawler.extractFromURL(url, playwrightOptions);
             } else {
-                this.logger.info('Usando extração HTML tradicional...');
+                if (this.logger) {
+                    this.logger.info('Usando extração HTML tradicional...');
+                }
                 links = await this.extractor.extractFromURL(url, extractionOptions);
             }
 
-            this.logger.info(`Encontradas ${links.length} URLs brutas`);
+            if (this.logger) {
+                this.logger.info(`Encontradas ${links.length} URLs brutas`);
+            }
 
             let filteredLinks = links;
 
             if (filter && filter.type) {
                 filteredLinks = this.filterManager.applyFilters(links, filter);
-                this.logger.info(`${filteredLinks.length} URLs após filtros`);
+                if (this.logger) {
+                    this.logger.info(`${filteredLinks.length} URLs após filtros`);
+                }
             }
 
             if (unique) {
                 const before = filteredLinks.length;
                 filteredLinks = [...new Set(filteredLinks)];
-                this.logger.info(`${filteredLinks.length} URLs únicas (removidas ${before - filteredLinks.length} duplicatas)`);
+                if (this.logger) {
+                    this.logger.info(`${filteredLinks.length} URLs únicas (removidas ${before - filteredLinks.length} duplicatas)`);
+                }
             }
 
             return filteredLinks;
 
         } catch (error) {
-            this.logger.error(`Erro no crawling: ${error.message}`);
+            if (this.logger) {
+                this.logger.error(`Erro no crawling: ${error.message}`);
+            }
 
             if (options.usePlaywright) {
-                this.logger.warn('Tentando fallback para extração HTML tradicional...');
+                if (this.logger) {
+                    this.logger.warn('Tentando fallback para extração HTML tradicional...');
+                }
                 return await this.crawl(url, { ...options, usePlaywright: false });
             }
 

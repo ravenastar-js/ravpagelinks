@@ -33,10 +33,10 @@ function showBanner() {
         backgroundColor: '#555555'
     };
 
-    const welcomeText = chalk.white.bold('🚀 Ferramenta de Enumeração de URLs\n') +
+    const welcomeText = chalk.white.bold('🚀 Ferramenta Avançada de Enumeração de URLs\n') +
         chalk.white('📝 Extrai URLs de páginas web com renderização JavaScript\n') +
         chalk.white('🔧 Múltiplos métodos de extração e filtros\n') +
-        chalk.white('📊 Com sistema de Logs');
+        chalk.white('📊 Logs opcionais e relatórios detalhados');
 
     console.log(boxen(welcomeText, boxenOptions));
 }
@@ -81,6 +81,11 @@ const argv = yargs(hideBin(process.argv))
         type: 'boolean',
         description: '📢 Habilita logging detalhado'
     })
+    .option('enable-logs', {
+        type: 'boolean',
+        description: '📝 Habilita sistema de logs em arquivo',
+        default: false
+    })
     .option('timeout', {
         type: 'number',
         description: '⏰ Timeout da requisição em milissegundos',
@@ -114,10 +119,6 @@ const argv = yargs(hideBin(process.argv))
         description: '🌐 Navegador a ser usado pelo Playwright',
         default: 'chromium'
     })
-    .option('no-logs', {
-        type: 'boolean',
-        description: '📝 Desabilita logging em arquivo'
-    })
     .option('log-dir', {
         type: 'string',
         description: '📂 Diretório para arquivos de log',
@@ -126,7 +127,8 @@ const argv = yargs(hideBin(process.argv))
     .example([
         ['$0 https://exemplo.com', 'Extração básica de URLs'],
         ['$0 https://exemplo.com -o resultados -v', 'Salva em diretório com logging detalhado'],
-        ['$0 https://exemplo.com -f exemplo.com --unique', 'Filtra por domínio e remove duplicatas']
+        ['$0 https://exemplo.com -f exemplo.com --unique', 'Filtra por domínio e remove duplicatas'],
+        ['$0 https://exemplo.com --enable-logs', 'Habilita sistema de logs em arquivo']
     ])
     .help()
     .alias('help', 'h')
@@ -134,19 +136,18 @@ const argv = yargs(hideBin(process.argv))
     .alias('version', 'V')
     .argv;
 
-const logger = new AdvancedLogger({
+
+const logger = argv.enableLogs ? new AdvancedLogger({
     verbose: argv.verbose,
-    logToFile: !argv.noLogs,
+    logToFile: true,
     logDir: argv.logDir,
     colors: true,
     timestamp: true
-});
+}) : null;
 
 /**
  * 🚀 Função principal que executa o processo de extração de URLs
  * @async
- * @function main
- * @throws {Error} ❌ Se a URL for inválida ou ocorrer erro no crawling
  */
 async function main() {
     try {
@@ -162,57 +163,84 @@ async function main() {
         const userAgent = argv.userAgent;
 
         if (!url) {
-            logger.error('URL é obrigatória');
+            console.error(chalk.red('❌ URL é obrigatória'));
             process.exit(1);
         }
 
         try {
             new URL(url);
         } catch (error) {
-            logger.error(`URL inválida: ${url}`);
+            console.error(chalk.red(`❌ URL inválida: ${url}`));
             process.exit(1);
         }
 
-        logger.start(`Iniciando enumeração de URLs: ${chalk.cyan(url)}`);
-        logger.file(`Diretório de saída: ${chalk.blue(outputDir)}`);
-        logger.time(`Timeout: ${chalk.yellow(timeout + 'ms')}`);
+        if (logger) {
+            logger.start(`Iniciando enumeração de URLs: ${chalk.cyan(url)}`);
+            logger.file(`Diretório de saída: ${chalk.blue(outputDir)}`);
+            logger.time(`Timeout: ${chalk.yellow(timeout + 'ms')}`);
+        } else {
+            console.log(chalk.blue('🚀 Iniciando enumeração de URLs:'), chalk.cyan(url));
+        }
 
         let filterConfig = {};
 
         if (filterFile) {
             filterConfig.type = 'file';
             filterConfig.value = filterFile;
-            logger.filter(`Usando arquivo de filtro: ${chalk.magenta(filterFile)}`);
+            if (logger) {
+                logger.filter(`Usando arquivo de filtro: ${chalk.magenta(filterFile)}`);
+            } else {
+                console.log(chalk.magenta('🔧 Usando arquivo de filtro:'), filterFile);
+            }
 
             if (!fs.existsSync(filterFile)) {
-                logger.warn(`Arquivo de filtro não encontrado: ${filterFile}`);
-                logger.info(`Criando arquivo de exemplo: ${chalk.blue(filterFile)}`);
+                const warnMsg = `Arquivo de filtro não encontrado: ${filterFile}`;
+                if (logger) {
+                    logger.warn(warnMsg);
+                    logger.info(`Criando arquivo de exemplo: ${chalk.blue(filterFile)}`);
+                } else {
+                    console.log(chalk.yellow('⚠️ ' + warnMsg));
+                    console.log(chalk.blue('📄 Criando arquivo de exemplo:'), filterFile);
+                }
                 FileHandler.createEmptyFilterFile(filterFile);
             }
         } else if (filterPattern) {
             if (filterType === 'domain') {
                 filterConfig.type = 'domain';
                 filterConfig.value = filterPattern;
-                logger.filter(`Filtro de domínio: ${chalk.magenta(filterPattern)}`);
+                if (logger) {
+                    logger.filter(`Filtro de domínio: ${chalk.magenta(filterPattern)}`);
+                }
             } else if (filterType === 'regex') {
                 filterConfig.type = 'regex';
                 filterConfig.value = filterPattern;
-                logger.filter(`Filtro regex: ${chalk.magenta(filterPattern)}`);
+                if (logger) {
+                    logger.filter(`Filtro regex: ${chalk.magenta(filterPattern)}`);
+                }
             } else {
                 if (filterPattern.includes('*') || filterPattern.startsWith('^')) {
                     filterConfig.type = 'regex';
                     filterConfig.value = filterPattern;
-                    logger.filter(`Filtro regex detectado automaticamente: ${chalk.magenta(filterPattern)}`);
+                    if (logger) {
+                        logger.filter(`Filtro regex detectado automaticamente: ${chalk.magenta(filterPattern)}`);
+                    }
                 } else {
                     filterConfig.type = 'domain';
                     filterConfig.value = filterPattern;
-                    logger.filter(`Filtro de domínio detectado automaticamente: ${chalk.magenta(filterPattern)}`);
+                    if (logger) {
+                        logger.filter(`Filtro de domínio detectado automaticamente: ${chalk.magenta(filterPattern)}`);
+                    }
                 }
             }
         }
 
         if (unique) {
-            logger.info(`Remoção de duplicatas: ${chalk.green('Habilitada')}`);
+            const uniqueMsg = `Remoção de duplicatas: ${chalk.green('Habilitada')}`;
+            if (logger) {
+                logger.info(uniqueMsg);
+            } else {
+                console.log(chalk.green('✨ ' + uniqueMsg));
+            }
         }
 
         const crawler = new RavPageLinks({
@@ -220,6 +248,7 @@ async function main() {
             userAgent,
             verbose: argv.verbose,
             usePlaywright: !argv.noPlaywright,
+            enableLogs: argv.enableLogs,
             playwrightOptions: {
                 headless: argv.headless,
                 waitForTimeout: argv.waitTime,
@@ -227,9 +256,14 @@ async function main() {
             }
         });
 
-        logger.info(`Método de extração: ${chalk.cyan(!argv.noPlaywright ? 'Playwright (renderização JavaScript)' : 'HTML tradicional')}`);
+        const methodMsg = `Método de extração: ${chalk.cyan(!argv.noPlaywright ? 'Playwright (renderização JavaScript)' : 'HTML tradicional')}`;
+        if (logger) {
+            logger.info(methodMsg);
+        } else {
+            console.log(chalk.cyan('🌐 ' + methodMsg));
+        }
 
-        if (!argv.noPlaywright) {
+        if (!argv.noPlaywright && logger) {
             logger.debug(`Navegador: ${argv.browser}, Headless: ${argv.headless}, Tempo de espera: ${argv.waitTime}ms`);
         }
 
@@ -258,57 +292,83 @@ async function main() {
 
         if (!fs.existsSync(domainDir)) {
             fs.mkdirSync(domainDir, { recursive: true });
-            logger.file(`Diretório criado: ${chalk.blue(domainDir)}`);
+            const dirMsg = `Diretório criado: ${chalk.blue(domainDir)}`;
+            if (logger) {
+                logger.file(dirMsg);
+            } else {
+                console.log(chalk.blue('📁 ' + dirMsg));
+            }
         }
 
         FileHandler.saveURLsToFile(links, outputFile);
 
-        logger.separator();
-        logger.stats('ESTATÍSTICAS DE EXTRAÇÃO');
-        logger.stats(`Total de URLs encontradas: ${chalk.cyan(links.length)}`);
-        logger.stats(`Tempo de execução: ${chalk.yellow(duration + 'ms')}`);
-        logger.stats(`Domínio analisado: ${chalk.green(domain)}`);
-        logger.stats(`Página processada: ${chalk.blue(urlObj.pathname || '/')}`);
-        logger.stats(`Arquivo de saída: ${chalk.blue(outputFile)}`);
-
-        if (filterConfig.type) {
-            logger.stats(`Filtro aplicado: ${chalk.magenta(filterConfig.type + ' - ' + filterConfig.value)}`);
-        }
-
-        if (links.length > 0 && argv.verbose) {
+        if (logger) {
             logger.separator();
-            logger.info(`${chalk.cyan('URLs de exemplo:')}`);
-            links.slice(0, 5).forEach((link, index) => {
-                logger.link(`${index + 1}. ${link}`);
-            });
-            if (links.length > 5) {
-                logger.info(`... e mais ${links.length - 5} URLs`);
+            logger.stats('ESTATÍSTICAS DE EXTRAÇÃO');
+            logger.stats(`Total de URLs encontradas: ${chalk.cyan(links.length)}`);
+            logger.stats(`Tempo de execução: ${chalk.yellow(duration + 'ms')}`);
+            logger.stats(`Domínio analisado: ${chalk.green(domain)}`);
+            logger.stats(`Página processada: ${chalk.blue(urlObj.pathname || '/')}`);
+            logger.stats(`Arquivo de saída: ${chalk.blue(outputFile)}`);
+
+            if (filterConfig.type) {
+                logger.stats(`Filtro aplicado: ${chalk.magenta(filterConfig.type + ' - ' + filterConfig.value)}`);
+            }
+
+            if (links.length > 0 && argv.verbose) {
+                logger.separator();
+                logger.info(`${chalk.cyan('URLs de exemplo:')}`);
+                links.slice(0, 5).forEach((link, index) => {
+                    logger.link(`${index + 1}. ${link}`);
+                });
+                if (links.length > 5) {
+                    logger.info(`... e mais ${links.length - 5} URLs`);
+                }
+            }
+
+            logger.complete(`Enumeração de URLs concluída com sucesso!`);
+            logger.file(`URLs salvas em: ${chalk.blue(outputFile)}`);
+            logger.endSession();
+        } else {
+            console.log(chalk.green('✅ Enumeração de URLs concluída com sucesso!'));
+            console.log(chalk.blue('📊 Estatísticas:'));
+            console.log(`   • URLs encontradas: ${chalk.cyan(links.length)}`);
+            console.log(`   • Tempo de execução: ${chalk.yellow(duration + 'ms')}`);
+            console.log(`   • Arquivo salvo: ${chalk.blue(outputFile)}`);
+            if (filterConfig.type) {
+                console.log(`   • Filtro aplicado: ${chalk.magenta(filterConfig.type)}`);
             }
         }
 
-        logger.complete(`Enumeração de URLs concluída com sucesso!`);
-        logger.file(`URLs salvas em: ${chalk.blue(outputFile)}`);
-        logger.endSession();
-
     } catch (error) {
-        logger.error(`Falha na execução: ${error.message}`);
-
-        if (argv.verbose) {
-            logger.debug(error.stack);
+        const errorMsg = `Falha na execução: ${error.message}`;
+        if (logger) {
+            logger.error(errorMsg);
+            if (argv.verbose) {
+                logger.debug(error.stack);
+            }
+            logger.endSession();
+        } else {
+            console.error(chalk.red('❌ ' + errorMsg));
+            if (argv.verbose) {
+                console.error(chalk.gray(error.stack));
+            }
         }
-
-        logger.endSession();
         process.exit(1);
     }
 }
 
 /**
  * 🛑 Manipula interrupção por Ctrl+C
- * @function SIGINT handler
  */
 process.on('SIGINT', () => {
-    logger.error('Processo interrompido pelo usuário');
-    logger.endSession();
+    const interruptMsg = 'Processo interrompido pelo usuário';
+    if (logger) {
+        logger.error(interruptMsg);
+        logger.endSession();
+    } else {
+        console.log(chalk.yellow('⚠️ ' + interruptMsg));
+    }
     process.exit(0);
 });
 
