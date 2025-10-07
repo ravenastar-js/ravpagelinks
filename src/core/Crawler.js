@@ -181,9 +181,12 @@ class RavPageLinks {
  */
 async function extractLinksFromURL(url, options = {}) {
     const crawler = new RavPageLinks(options);
-    const links = await crawler.crawl(url, options);
-    await crawler.close();
-    return links;
+    try {
+        const links = await crawler.crawl(url, options);
+        return links;
+    } finally {
+        await crawler.close();
+    }
 }
 
 /**

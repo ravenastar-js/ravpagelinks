@@ -33,7 +33,7 @@ function showBanner() {
         backgroundColor: '#555555'
     };
 
-    const welcomeText = chalk.white.bold('🚀 Ferramenta Avançada de Enumeração de URLs\n') +
+    const welcomeText = chalk.white.bold('🚀 Ferramenta de Enumeração de URLs\n') +
         chalk.white('📝 Extrai URLs de páginas web com renderização JavaScript\n') +
         chalk.white('🔧 Múltiplos métodos de extração e filtros\n') +
         chalk.white('📊 Logs opcionais e relatórios detalhados');
@@ -139,7 +139,7 @@ const argv = yargs(hideBin(process.argv))
 
 const logger = argv.enableLogs ? new AdvancedLogger({
     verbose: argv.verbose,
-    logToFile: true,
+    logToFile: argv.enableLogs,
     logDir: argv.logDir,
     colors: true,
     timestamp: true
@@ -150,6 +150,8 @@ const logger = argv.enableLogs ? new AdvancedLogger({
  * @async
  */
 async function main() {
+    let crawler;
+
     try {
         showBanner();
 
@@ -243,7 +245,7 @@ async function main() {
             }
         }
 
-        const crawler = new RavPageLinks({
+        crawler = new RavPageLinks({
             timeout,
             userAgent,
             verbose: argv.verbose,
@@ -355,6 +357,19 @@ async function main() {
             }
         }
         process.exit(1);
+    } finally {
+        if (crawler) {
+            try {
+                await crawler.close();
+            } catch (closeError) {
+                if (logger) {
+                    logger.debug(`Erro ao fechar crawler: ${closeError.message}`);
+                }
+            }
+        }
+
+        console.log(chalk.gray('\n💡 Pressione Ctrl+C para voltar ao terminal'));
+        process.exit(0);
     }
 }
 

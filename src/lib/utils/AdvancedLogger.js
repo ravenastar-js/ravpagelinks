@@ -21,7 +21,7 @@ class AdvancedLogger {
     constructor(options = {}) {
         this.options = {
             verbose: false,
-            logToFile: true,
+            logToFile: false,
             logDir: 'logs',
             colors: true,
             timestamp: true,
@@ -30,26 +30,31 @@ class AdvancedLogger {
 
         this.logFile = null;
         this.sessionId = moment().format('YYYYMMDD_HHmmss');
-        this.setupLogFile();
+        
+        if (this.options.logToFile) {
+            this.setupLogFile();
+        }
     }
 
     /**
      * 📁 Configura arquivo de log
      */
     setupLogFile() {
-        if (this.options.logToFile) {
-            const logDir = path.resolve(process.cwd(), this.options.logDir);
-
-            if (!fs.existsSync(logDir)) {
-                fs.mkdirSync(logDir, { recursive: true });
-            }
-
-            this.logFile = path.join(logDir, `ravpagelinks_${this.sessionId}.log`);
-
-            this.writeToFile(`🚀 SESSÃO RAVPAGELINKS INICIADA - ${moment().format('YYYY-MM-DD HH:mm:ss')}`);
-            this.writeToFile(`📁 Arquivo de log: ${this.logFile}`);
-            this.writeToFile('='.repeat(80));
+        if (!this.options.logToFile) {
+            return;
         }
+
+        const logDir = path.resolve(process.cwd(), this.options.logDir);
+
+        if (!fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir, { recursive: true });
+        }
+
+        this.logFile = path.join(logDir, `ravpagelinks_${this.sessionId}.log`);
+
+        this.writeToFile(`🚀 SESSÃO RAVPAGELINKS INICIADA - ${moment().format('YYYY-MM-DD HH:mm:ss')}`);
+        this.writeToFile(`📁 Arquivo de log: ${this.logFile}`);
+        this.writeToFile('='.repeat(80));
     }
 
     /**
@@ -57,7 +62,7 @@ class AdvancedLogger {
      * @param {string} message - 📝 Mensagem para registrar
      */
     writeToFile(message) {
-        if (this.logFile) {
+        if (this.logFile && this.options.logToFile) {
             const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
             const logMessage = `[${timestamp}] ${message.replace(/\x1b\[[0-9;]*m/g, '')}\n`;
 
@@ -265,7 +270,7 @@ class AdvancedLogger {
      * 🏁 Finaliza sessão de log
      */
     endSession() {
-        if (this.logFile) {
+        if (this.logFile && this.options.logToFile) {
             this.writeToFile('='.repeat(80));
             this.writeToFile(`🏁 SESSÃO RAVPAGELINKS FINALIZADA - ${moment().format('YYYY-MM-DD HH:mm:ss')}`);
 
