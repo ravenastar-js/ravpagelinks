@@ -34,9 +34,9 @@ function showBanner() {
     };
 
     const welcomeText = chalk.white.bold('🚀 Ferramenta de Enumeração de URLs\n') +
-        chalk.gray('📝 Extrai URLs de páginas web com renderização JavaScript\n') +
-        chalk.gray('🔧 Múltiplos métodos de extração e filtros\n') +
-        chalk.gray('📊 Com sistema de Logs');
+        chalk.white('📝 Extrai URLs de páginas web com renderização JavaScript\n') +
+        chalk.white('🔧 Múltiplos métodos de extração e filtros\n') +
+        chalk.white('📊 Com sistema de Logs');
 
     console.log(boxen(welcomeText, boxenOptions));
 }
