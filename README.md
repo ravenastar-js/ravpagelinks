@@ -50,7 +50,7 @@ Se precisar de ajuda ou quiser falar com a equipe, entre no nosso servidor de su
 
 ## 📋 Índice
 - [🎯 Visão Geral](#-visão-geral)
-- [⚡ Instalação Rápida](#-instalação-rápida)
+- [📦 Instalação Rápida](#-instalação-rápida)
 - [🛠️ Como Usar](#️-como-usar)
 - [🎛️ Opções da CLI](#️-opções-da-cli)
 - [🔧 Filtros Avançados](#-filtros-avançados)
@@ -71,7 +71,13 @@ O **RavPageLinks** é uma ferramenta básica de enumeração de URLs que combina
 - 🚀 **Performance Otimizada**: Timeouts configuráveis e fallbacks
 - 🔒 **Validação Robusta**: URLs validadas e normalizadas
 
-## ⚡ Instalação Rápida
+## 📦 Instalação Rápida
+
+<details>
+<summary>📥 Como instalar o NodeJS?</summary>
+
+- [COMO INSTALAR NODE JS NO WINDOWS?](https://youtu.be/-jft_9PlffQ)
+</details>
 
 ```bash
 # Instalar globalmente
