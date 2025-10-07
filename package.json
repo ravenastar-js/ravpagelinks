@@ -22,17 +22,19 @@
         "axios",
         "chalk",
         "playwright",
-        "moment"
+        "moment",
+        "boxen"
     ],
     "author": "ravenastar-js",
     "license": "MIT",
     "dependencies": {
         "axios": "^1.6.0",
-        "jsdom": "^22.0.0",
-        "yargs": "^17.7.2",
+        "boxen": "^8.0.1",
         "chalk": "^4.1.2",
+        "jsdom": "^22.0.0",
+        "moment": "^2.29.4",
         "playwright": "^1.40.0",
-        "moment": "^2.29.4"
+        "yargs": "^17.7.2"
     },
     "repository": {
         "type": "git",
