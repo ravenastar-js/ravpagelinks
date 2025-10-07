@@ -368,7 +368,6 @@ async function main() {
             }
         }
 
-        console.log(chalk.gray('\n💡 Pressione Ctrl+C para voltar ao terminal'));
         process.exit(0);
     }
 }
