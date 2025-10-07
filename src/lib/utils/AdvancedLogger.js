@@ -30,7 +30,7 @@ class AdvancedLogger {
 
         this.logFile = null;
         this.sessionId = moment().format('YYYYMMDD_HHmmss');
-        
+
         if (this.options.logToFile) {
             this.setupLogFile();
         }
@@ -164,11 +164,9 @@ class AdvancedLogger {
      * @param {string} message - 📝 Mensagem de debug
      */
     debug(message) {
-        if (this.options.verbose) {
-            const formatted = this.formatMessage(message, 'debug');
-            console.log(formatted);
-            this.writeToFile(`DEBUG: ${message}`);
-        }
+        const formatted = this.formatMessage(message, 'debug');
+        console.log(formatted);
+        this.writeToFile(`DEBUG: ${message}`);
     }
 
     /**

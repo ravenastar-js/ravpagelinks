@@ -109,18 +109,20 @@ class PlaywrightCrawler {
                 await this.init();
             }
 
-            this.logger.info(`Acessando página: ${url}`);
+            if (this.options.verbose) {
+                this.logger.info(`Acessando página: ${url}`);
+            }
             page = await this.context.newPage();
 
-            page.on('console', msg => {
-                if (this.options.verbose) {
+            if (this.options.verbose) {
+                page.on('console', msg => {
                     this.logger.debug(`[Console da Página] ${msg.type()}: ${msg.text()}`);
-                }
-            });
+                });
 
-            page.on('pageerror', error => {
-                this.logger.debug(`[Erro na Página] ${error.message}`);
-            });
+                page.on('pageerror', error => {
+                    this.logger.debug(`[Erro na Página] ${error.message}`);
+                });
+            }
 
             page.setDefaultTimeout(this.options.timeout);
             page.setDefaultNavigationTimeout(this.options.timeout);
@@ -265,7 +267,7 @@ class PlaywrightCrawler {
                         if (url) results.links.add(url);
                     }
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const resourceElements = [
@@ -287,7 +289,7 @@ class PlaywrightCrawler {
                         if (url) results.scripts.add(url);
                     }
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const srcsetElements = document.querySelectorAll('img[srcset], source[srcset]');
@@ -303,7 +305,7 @@ class PlaywrightCrawler {
                         });
                     }
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const forms = document.querySelectorAll('form[action]');
@@ -314,7 +316,7 @@ class PlaywrightCrawler {
                         if (url) results.links.add(url);
                     }
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const metaTags = document.querySelectorAll('meta[content]');
@@ -334,7 +336,7 @@ class PlaywrightCrawler {
                         }
                     }
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const styleElements = document.querySelectorAll('[style]');
@@ -351,7 +353,7 @@ class PlaywrightCrawler {
                         });
                     }
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const styleTags = document.querySelectorAll('style');
@@ -368,7 +370,7 @@ class PlaywrightCrawler {
                         });
                     }
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const allElements = document.querySelectorAll('*');
@@ -383,7 +385,7 @@ class PlaywrightCrawler {
                         }
                     });
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const eventAttributes = ['onclick', 'onload', 'onerror', 'onmouseover', 'onsubmit'];
@@ -400,7 +402,7 @@ class PlaywrightCrawler {
                         }
                     });
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const textContent = document.body ? document.body.innerText : '';
@@ -411,7 +413,7 @@ class PlaywrightCrawler {
                         if (resolved) results.links.add(resolved);
                     });
                 }
-            } catch (e) {}
+            } catch (e) { }
 
             try {
                 const customAttrSelectors = [
@@ -432,7 +434,7 @@ class PlaywrightCrawler {
                         }
                     });
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             return {
                 links: Array.from(results.links),

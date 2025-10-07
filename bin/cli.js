@@ -135,8 +135,8 @@ const argv = yargs(hideBin(process.argv))
     .alias('version', 'V')
     .argv;
 
-
-const logger = argv.enableLogs ? new AdvancedLogger({
+const shouldEnableLogs = argv.enableLogs || argv.verbose;
+const logger = shouldEnableLogs ? new AdvancedLogger({
     verbose: argv.verbose,
     logToFile: argv.enableLogs,
     logDir: argv.logDir,

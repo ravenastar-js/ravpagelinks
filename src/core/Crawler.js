@@ -35,10 +35,11 @@ class RavPageLinks {
         this.extractor = new URLExtractor(this.options);
         this.playwrightCrawler = this.options.usePlaywright ? new PlaywrightCrawler({
             ...this.options,
-            ...this.options.playwrightOptions
+            ...this.options.playwrightOptions,
+            verbose: this.options.verbose
         }) : null;
         this.filterManager = new FilterManager();
-        
+
         this.logger = this.options.enableLogs ? new AdvancedLogger({
             verbose: this.options.verbose,
             colors: true,
