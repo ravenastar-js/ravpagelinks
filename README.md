@@ -18,6 +18,7 @@
 [![📄 License](https://img.shields.io/github/license/ravenastar-js/ravpagelinks?style=for-the-badge&label=%F0%9F%93%84%20License&color=2d7445&logo=book&logoColor=white&labelColor=444&radius=10)](https://github.com/ravenastar-js/ravpagelinks/blob/main/LICENSE)
 [![🕒 Last Commit](https://img.shields.io/github/last-commit/ravenastar-js/ravpagelinks?style=for-the-badge&label=%F0%9F%95%92%20Last%20Commit&color=2d7445&logo=clock&logoColor=white&labelColor=444&radius=10)](https://github.com/ravenastar-js/ravpagelinks/commits/all)
 [![📦 Repo Size](https://img.shields.io/github/repo-size/ravenastar-js/ravpagelinks?style=for-the-badge&label=%F0%9F%93%A6%20Repo%20Size&color=2d7445&logo=database&logoColor=white&labelColor=444&radius=10)](https://github.com/ravenastar-js/ravpagelinks)
+[![⚙️ Node.js](https://img.shields.io/badge/%E2%9A%99%EF%B8%8F%20Node.js-16.0%2B-green?style=for-the-badge&logo=nodedotjs&color=2d7445&logoColor=white&labelColor=444&radius=10)](https://nodejs.org/pt/download)
 
 
 *Biblioteca NPM + CLI para extração de URL automática*
