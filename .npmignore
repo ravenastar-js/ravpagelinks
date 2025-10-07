@@ -1,0 +1,6 @@
+package-lock.json
+filtros.txt
+node_modules/
+results/
+.github/
+media/
