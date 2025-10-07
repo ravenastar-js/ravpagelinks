@@ -1,0 +1,45 @@
+{
+    "name": "ravpagelinks",
+    "version": "1.0.0",
+    "description": "🕷️ Ferramenta básica de Enumeração de URLs em Páginas Web.",
+    "main": "index.js",
+    "bin": {
+        "ravpagelinks": "./bin/cli.js"
+    },
+    "scripts": {
+        "dev": "node bin/cli.js",
+        "dw-nav": "playwright install"
+    },
+    "keywords": [
+        "crawler",
+        "url-enumeration",
+        "dom",
+        "links",
+        "scraping",
+        "security",
+        "recon",
+        "ravenastar",
+        "axios",
+        "chalk",
+        "playwright",
+        "moment"
+    ],
+    "author": "ravenastar-js",
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^1.6.0",
+        "jsdom": "^22.0.0",
+        "yargs": "^17.7.2",
+        "chalk": "^4.1.2",
+        "playwright": "^1.40.0",
+        "moment": "^2.29.4"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ravenastar-js/ravpagelinks.git"
+    },
+    "homepage": "https://github.com/ravenastar-js/ravpagelinks#readme",
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}
