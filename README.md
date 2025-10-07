@@ -3,11 +3,7 @@
 <a href="https://www.npmjs.com/package/ravpagelinks" target="_blank"><img src="https://img.shields.io/badge/-ravpagelinks-c40404?style=flat-square&labelColor=c40404&logo=npm&logoColor=white&link=https://www.npmjs.com/package/ravpagelinks" height="40" /></a>  
  <a href="https://www.npmjs.com/package/ravpagelinks" target="_blank"><img alt="NPM Version" src="https://img.shields.io/npm/v/ravpagelinks?style=flat-square&logo=npm&labelColor=c40404&color=c40404" height="40" ></a>
 
-
-
 ---
-
-
 
 # 🚀 RavPageLinks  
 ### 🕷️ Ferramenta básica de Enumeração de URLs em Páginas Web
@@ -21,8 +17,7 @@
 [![⚙️ Node.js](https://img.shields.io/badge/%E2%9A%99%EF%B8%8F%20Node.js-16.0%2B-green?style=for-the-badge&logo=nodedotjs&color=2d7445&logoColor=white&labelColor=444&radius=10)](https://nodejs.org/pt/download)
 
 
-*Biblioteca NPM + CLI para extração de URL automática*
-
+*Biblioteca NPM + CLI para extração de URLs automática de páginas*
 
 
 ![RavPageLinks](media/ravpagelinks.png)
@@ -34,7 +29,6 @@ BANNER INSPIRADO EM
   <img src="https://i.imgur.com/Gbyx94i.png" width="180">
 </a>
 </div>
-
 
 ---
 
@@ -88,7 +82,7 @@ npm install -g ravpagelinks    # ✅ Completo
 # Ou usar diretamente com npx
 npx ravpagelinks https://secguide.pages.dev/ferramentas
 
-# Instalar navegadores do Playwright
+# Instalar navegador do Playwright
 npx ravpagelinks --dw-nav
 ```
 
@@ -107,7 +101,7 @@ npm remove -g ravpagelinks     # ✅ Alternativo
 # Extração básica
 ravpagelinks https://secguide.pages.dev/ferramentas
 
-# Com logging detalhado
+# Com logging detalhado no terminal
 ravpagelinks https://secguide.pages.dev/ferramentas -v
 
 # Salvar em diretório específico
@@ -133,6 +127,7 @@ ravpagelinks https://secguide.pages.dev/ferramentas -o resultados
 | `--filter-type` | - | 🎯 Tipo de filtro | `file` |
 | `--unique` | `-u` | ✨ Remover duplicatas | `false` |
 | `--verbose` | `-v` | 📢 Log detalhado | `false` |
+| `--enable-logs` | - | 📝 Logs em arquivo | `false` |
 | `--timeout` | - | ⏰ Timeout (ms) | `30000` |
 | `--no-playwright` | - | 🚫 Desativar Playwright | `false` |
 | `--headless` | - | 🌙 Navegador headless | `true` |
@@ -210,6 +205,11 @@ ravpagelinks https://secguide.pages.dev/ferramentas --filter-file meus_filtros.t
 ### 5. Performance Crítica
 ```bash
 ravpagelinks https://secguide.pages.dev/ferramentas --no-playwright --timeout 15000
+```
+
+### 6. Logs Completos
+```bash
+ravpagelinks https://secguide.pages.dev/ferramentas --verbose --enable-logs
 ```
 
 ## 🔍 Estrutura Técnica
