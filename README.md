@@ -78,7 +78,7 @@ O **RavPageLinks** é uma ferramenta básica de enumeração de URLs que combina
 npm install -g ravpagelinks
 
 # Ou usar diretamente com npx
-npx ravpagelinks https://exemplo.com
+npx ravpagelinks https://secguide.pages.dev/ferramentas
 
 # Instalar navegadores do Playwright
 npx ravpagelinks --dw-nav
@@ -89,13 +89,13 @@ npx ravpagelinks --dw-nav
 ### Uso Básico
 ```bash
 # Extração básica
-ravpagelinks https://exemplo.com
+ravpagelinks https://secguide.pages.dev/ferramentas
 
 # Com logging detalhado
-ravpagelinks https://exemplo.com -v
+ravpagelinks https://secguide.pages.dev/ferramentas -v
 
 # Salvar em diretório específico
-ravpagelinks https://exemplo.com -o resultados
+ravpagelinks https://secguide.pages.dev/ferramentas -o resultados
 ```
 
 ### Estrutura de Saída
@@ -173,27 +173,27 @@ Se o Playwright falhar, automaticamente usa extração HTML tradicional.
 
 ### 1. Reconhecimento Básico
 ```bash
-ravpagelinks https://alvo.com -v -o recon
+ravpagelinks https://secguide.pages.dev/ferramentas -v -o recon
 ```
 
 ### 2. Filtro por Domínio
 ```bash
-ravpagelinks https://alvo.com -f alvo.com --unique
+ravpagelinks https://secguide.pages.dev/ferramentas -f secguide.pages.dev --unique
 ```
 
 ### 3. Extração com JavaScript
 ```bash
-ravpagelinks https://app.alvo.com --scroll --wait-time 10000
+ravpagelinks https://secguide.pages.dev/ferramentas --scroll --wait-time 10000
 ```
 
 ### 4. Filtros Complexos
 ```bash
-ravpagelinks https://alvo.com --filter-file meus_filtros.txt --filter-type regex
+ravpagelinks https://secguide.pages.dev/ferramentas --filter-file meus_filtros.txt --filter-type regex
 ```
 
 ### 5. Performance Crítica
 ```bash
-ravpagelinks https://alvo.com --no-playwright --timeout 15000
+ravpagelinks https://secguide.pages.dev/ferramentas --no-playwright --timeout 15000
 ```
 
 ## 🔍 Estrutura Técnica
@@ -271,3 +271,13 @@ cd ravpagelinks
 npm install
 npm run dev
 ```
+
+---
+
+<div align="center">
+
+## Feito com 💚 por [RavenaStar](https://linktr.ee/ravenastar)
+
+[⬆ Voltar ao topo](#-ravpagelinks)
+
+</div>
