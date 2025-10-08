@@ -21,23 +21,32 @@ class RavPageLinks {
      * @param {boolean} options.enableLogs - 📝 Habilitar sistema de logs
      */
     constructor(options = {}) {
+        const isAndroid = process.platform === 'android';
+        const defaultUsePlaywright = !isAndroid;
         this.options = {
             timeout: 30000,
             userAgent: 'Mozilla/5.0 (compatible; RavPageLinks/1.3.0)',
             verbose: false,
             deepScan: true,
-            usePlaywright: true,
+            usePlaywright: defaultUsePlaywright,
             playwrightOptions: {},
             enableLogs: false,
             ...options
         };
 
+        if (isAndroid && this.options.usePlaywright) {
+            this.options.usePlaywright = false;
+            if (this.options.verbose) {
+                console.log('🟡 Aviso: Playwright desativado automaticamente no Android');
+            }
+        }
+
         this.extractor = new URLExtractor(this.options);
-        this.playwrightCrawler = this.options.usePlaywright ? new PlaywrightCrawler({
+        this.playwrightCrawler = (this.options.usePlaywright && !isAndroid) ? new PlaywrightCrawler({
             ...this.options,
-            ...this.options.playwrightOptions,
-            verbose: this.options.verbose
+            ...this.options.playwrightOptions
         }) : null;
+
         this.filterManager = new FilterManager();
 
         this.logger = this.options.enableLogs ? new AdvancedLogger({
@@ -45,6 +54,13 @@ class RavPageLinks {
             colors: true,
             timestamp: true
         }) : null;
+
+        if (this.options.verbose && isAndroid) {
+            const logMsg = this.logger ?
+                this.logger.info.bind(this.logger) :
+                console.log;
+            logMsg('📱 Executando em Android - Modo HTML tradicional');
+        }
     }
 
     /**
@@ -68,22 +84,33 @@ class RavPageLinks {
             ...extractionOptions
         } = options;
 
+        const isAndroid = process.platform === 'android';
+        const finalUsePlaywright = usePlaywright && !isAndroid;
+
         try {
             if (this.logger) {
                 this.logger.info(`Iniciando crawling em: ${url}`);
+
+                if (isAndroid) {
+                    this.logger.info('📱 Android detectado - Usando extração HTML tradicional');
+                } else {
+                    this.logger.info(finalUsePlaywright ?
+                        '🌐 Usando Playwright para renderização JavaScript...' :
+                        '🏗️ Usando extração HTML tradicional...');
+                }
+            } else if (this.options.verbose) {
+                console.log(isAndroid ?
+                    '📱 Android detectado - Usando extração HTML tradicional' :
+                    (finalUsePlaywright ?
+                        '🌐 Usando Playwright para renderização JavaScript...' :
+                        '🏗️ Usando extração HTML tradicional...'));
             }
 
             let links;
 
-            if (usePlaywright && this.playwrightCrawler) {
-                if (this.logger) {
-                    this.logger.info('Usando Playwright para renderização JavaScript...');
-                }
+            if (finalUsePlaywright && this.playwrightCrawler) {
                 links = await this.playwrightCrawler.extractFromURL(url, playwrightOptions);
             } else {
-                if (this.logger) {
-                    this.logger.info('Usando extração HTML tradicional...');
-                }
                 links = await this.extractor.extractFromURL(url, extractionOptions);
             }
 
@@ -115,7 +142,7 @@ class RavPageLinks {
                 this.logger.error(`Erro no crawling: ${error.message}`);
             }
 
-            if (options.usePlaywright) {
+            if (options.usePlaywright && !isAndroid) {
                 if (this.logger) {
                     this.logger.warn('Tentando fallback para extração HTML tradicional...');
                 }
@@ -125,6 +152,7 @@ class RavPageLinks {
             throw error;
         }
     }
+
 
     /**
      * 🔒 Fecha recursos do Playwright

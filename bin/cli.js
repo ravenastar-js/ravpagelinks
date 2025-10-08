@@ -10,6 +10,7 @@ const boxen = require('boxen').default;
 const figlet = require('figlet');
 const path = require('path');
 const fs = require('fs');
+const isAndroid = process.platform === 'android';
 
 /**
  * 🎯 Exibe banner visual da aplicação
@@ -38,6 +39,10 @@ function showBanner() {
         chalk.white('📊 Logs opcionais e relatórios detalhados');
 
     console.log(boxen(welcomeText, boxenOptions));
+
+    if (isAndroid) {
+        console.log(chalk.yellow('📱 Aviso: Executando em Android - Playwright desativado automaticamente'));
+    }
 }
 
 const argv = yargs(hideBin(process.argv))
@@ -96,27 +101,42 @@ const argv = yargs(hideBin(process.argv))
     })
     .option('no-playwright', {
         type: 'boolean',
-        description: '🚫 Desabilita Playwright'
+        description: isAndroid ?
+            '🚫 Playwright já desativado no Android' :
+            '🚫 Desabilita Playwright',
+        default: isAndroid
     })
     .option('headless', {
         type: 'boolean',
-        description: '🌙 Executa navegador em modo headless',
-        default: true
+        description: isAndroid ?
+            '🌙 Não disponível no Android' :
+            '🌙 Executa navegador em modo headless',
+        default: true,
+        hidden: isAndroid
     })
     .option('wait-time', {
         type: 'number',
-        description: '⏳ Tempo de espera para carregamento JavaScript em ms',
-        default: 5000
+        description: isAndroid ?
+            '⏳ Não aplicável no Android' :
+            '⏳ Tempo de espera para carregamento JavaScript em ms',
+        default: 5000,
+        hidden: isAndroid
     })
     .option('scroll', {
         type: 'boolean',
-        description: '📜 Rola a página para carregar conteúdo lazy'
+        description: isAndroid ?
+            '📜 Não disponível no Android' :
+            '📜 Rola a página para carregar conteúdo lazy',
+        hidden: isAndroid
     })
     .option('browser', {
         type: 'string',
         choices: ['chromium', 'firefox', 'webkit'],
-        description: '🌐 Navegador a ser usado pelo Playwright',
-        default: 'chromium'
+        description: isAndroid ?
+            '🌐 Não disponível no Android' :
+            '🌐 Navegador a ser usado pelo Playwright',
+        default: 'chromium',
+        hidden: isAndroid
     })
     .option('log-dir', {
         type: 'string',
@@ -179,6 +199,10 @@ async function main() {
             logger.start(`Iniciando enumeração de URLs: ${chalk.cyan(url)}`);
             logger.file(`Diretório de saída: ${chalk.blue(outputDir)}`);
             logger.time(`Timeout: ${chalk.yellow(timeout + 'ms')}`);
+
+            if (isAndroid) {
+                logger.info('📱 Android detectado - Modo HTML tradicional');
+            }
         } else {
             console.log(chalk.white.bold('🚀 Iniciando enumeração de URLs:'), chalk.cyan(url));
         }
@@ -243,12 +267,13 @@ async function main() {
                 console.log(chalk.green('✨ ' + uniqueMsg));
             }
         }
+        const finalUsePlaywright = !isAndroid && !argv.noPlaywright;
 
         crawler = new RavPageLinks({
             timeout,
             userAgent,
             verbose: argv.verbose,
-            usePlaywright: !argv.noPlaywright,
+            usePlaywright: finalUsePlaywright,
             enableLogs: argv.enableLogs,
             playwrightOptions: {
                 headless: argv.headless,
@@ -257,11 +282,14 @@ async function main() {
             }
         });
 
-        const methodMsg = `Método de extração: ${chalk.cyan(!argv.noPlaywright ? 'Playwright (renderização JavaScript)' : 'HTML tradicional')}`;
+        const methodMsg = isAndroid ?
+            '📱 Método de extração: HTML tradicional (Android)' :
+            `🌐 Método de extração: ${finalUsePlaywright ? 'Playwright (renderização JavaScript)' : 'HTML tradicional'}`;
+
         if (logger) {
             logger.info(methodMsg);
         } else {
-            console.log(chalk.cyan('🌐 ' + methodMsg));
+            console.log(chalk.cyan(isAndroid ? '📱 ' : '🌐 ') + methodMsg);
         }
 
         if (!argv.noPlaywright && logger) {
@@ -273,7 +301,7 @@ async function main() {
         const links = await crawler.crawl(url, {
             filter: filterConfig,
             unique: unique,
-            usePlaywright: !argv.noPlaywright,
+            usePlaywright: finalUsePlaywright,
             playwrightOptions: {
                 scrollToBottom: argv.scroll || false,
                 waitForTimeout: argv.waitTime || 5000
@@ -312,6 +340,10 @@ async function main() {
             logger.stats(`Página processada: ${chalk.blue(urlObj.pathname || '/')}`);
             logger.stats(`Arquivo de saída: ${chalk.blue(outputFile)}`);
 
+            if (isAndroid) {
+                logger.stats(`Plataforma: ${chalk.yellow('Android - HTML Tradicional')}`);
+            }
+
             if (filterConfig.type) {
                 logger.stats(`Filtro aplicado: ${chalk.magenta(filterConfig.type + ' - ' + filterConfig.value)}`);
             }
@@ -336,6 +368,9 @@ async function main() {
             console.log(`   • URLs encontradas: ${chalk.cyan(links.length)}`);
             console.log(`   • Tempo de execução: ${chalk.yellow(duration + 'ms')}`);
             console.log(`   • Arquivo salvo: ${chalk.cyan(outputFile)}`);
+            if (isAndroid) {
+                console.log(`   • Plataforma: ${chalk.yellow('Android')}`);
+            }
             if (filterConfig.type) {
                 console.log(`   • Filtro aplicado: ${chalk.magenta(filterConfig.type)}`);
             }
