@@ -1,7 +1,25 @@
 const URLExtractor = require('./URLExtractor');
-const PlaywrightCrawler = require('./PlaywrightCrawler');
 const FilterManager = require('../lib/filters/FilterManager');
 const AdvancedLogger = require('../lib/utils/AdvancedLogger');
+
+// 🆕 CARREGAMENTO CONDICIONAL DO PLAYWRIGHT
+let PlaywrightCrawler = null;
+let playwrightAvailable = false;
+
+try {
+    // 🆕 Tenta carregar o Playwright apenas se não for Android
+    const fs = require('fs');
+    const path = require('path');
+    const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '..', '.android-platform'));
+
+    if (!isAndroid) {
+        PlaywrightCrawler = require('./PlaywrightCrawler');
+        playwrightAvailable = true;
+    }
+} catch (error) {
+    console.warn('⚠️ Playwright não disponível:', error.message);
+    playwrightAvailable = false;
+}
 
 /**
  * 🕷️ Classe principal para crawling e extração de URLs
@@ -21,8 +39,14 @@ class RavPageLinks {
      * @param {boolean} options.enableLogs - 📝 Habilitar sistema de logs
      */
     constructor(options = {}) {
-        const isAndroid = process.platform === 'android';
-        const defaultUsePlaywright = !isAndroid;
+        const fs = require('fs');
+        const path = require('path');
+        const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '..', '.android-platform'));
+
+        // 🆕 DETERMINA SE PLAYWRIGHT ESTÁ DISPONÍVEL
+        const canUsePlaywright = playwrightAvailable && !isAndroid;
+        const defaultUsePlaywright = canUsePlaywright;
+
         this.options = {
             timeout: 30000,
             userAgent: 'Mozilla/5.0 (compatible; RavPageLinks/1.3.0)',
@@ -34,18 +58,22 @@ class RavPageLinks {
             ...options
         };
 
-        if (isAndroid && this.options.usePlaywright) {
+        // 🆕 FORÇA DESATIVAÇÃO SE PLAYWRIGHT NÃO ESTIVER DISPONÍVEL
+        if (!canUsePlaywright && this.options.usePlaywright) {
             this.options.usePlaywright = false;
             if (this.options.verbose) {
-                console.log('🟡 Aviso: Playwright desativado automaticamente no Android');
+                console.log('🟡 Aviso: Playwright não disponível nesta plataforma');
             }
         }
 
         this.extractor = new URLExtractor(this.options);
-        this.playwrightCrawler = (this.options.usePlaywright && !isAndroid) ? new PlaywrightCrawler({
-            ...this.options,
-            ...this.options.playwrightOptions
-        }) : null;
+
+        // 🆕 SÓ CRIA PLAYWRIGHT SE DISPONÍVEL E SOLICITADO
+        this.playwrightCrawler = (this.options.usePlaywright && PlaywrightCrawler) ?
+            new PlaywrightCrawler({
+                ...this.options,
+                ...this.options.playwrightOptions
+            }) : null;
 
         this.filterManager = new FilterManager();
 
@@ -55,11 +83,17 @@ class RavPageLinks {
             timestamp: true
         }) : null;
 
-        if (this.options.verbose && isAndroid) {
+        // 🆕 LOG INFORMATIVO SOBRE RECURSOS DISPONÍVEIS
+        if (this.options.verbose) {
+            const platformInfo = isAndroid ? '📱 Android' : process.platform;
+            const methodInfo = this.playwrightCrawler ?
+                '🌐 Playwright disponível' :
+                '🏗️ Apenas HTML tradicional';
+
             const logMsg = this.logger ?
                 this.logger.info.bind(this.logger) :
                 console.log;
-            logMsg('📱 Executando em Android - Modo HTML tradicional');
+            logMsg(`${platformInfo} - ${methodInfo}`);
         }
     }
 
@@ -84,31 +118,24 @@ class RavPageLinks {
             ...extractionOptions
         } = options;
 
-        const isAndroid = process.platform === 'android';
-        const finalUsePlaywright = usePlaywright && !isAndroid;
+        // 🆕 VERIFICAÇÃO FINAL DE DISPONIBILIDADE
+        const finalUsePlaywright = usePlaywright && this.playwrightCrawler;
 
         try {
             if (this.logger) {
                 this.logger.info(`Iniciando crawling em: ${url}`);
-
-                if (isAndroid) {
-                    this.logger.info('📱 Android detectado - Usando extração HTML tradicional');
-                } else {
-                    this.logger.info(finalUsePlaywright ?
-                        '🌐 Usando Playwright para renderização JavaScript...' :
-                        '🏗️ Usando extração HTML tradicional...');
-                }
+                this.logger.info(finalUsePlaywright ?
+                    '🌐 Usando Playwright para renderização JavaScript...' :
+                    '🏗️ Usando extração HTML tradicional...');
             } else if (this.options.verbose) {
-                console.log(isAndroid ?
-                    '📱 Android detectado - Usando extração HTML tradicional' :
-                    (finalUsePlaywright ?
-                        '🌐 Usando Playwright para renderização JavaScript...' :
-                        '🏗️ Usando extração HTML tradicional...'));
+                console.log(finalUsePlaywright ?
+                    '🌐 Usando Playwright para renderização JavaScript...' :
+                    '🏗️ Usando extração HTML tradicional...');
             }
 
             let links;
 
-            if (finalUsePlaywright && this.playwrightCrawler) {
+            if (finalUsePlaywright) {
                 links = await this.playwrightCrawler.extractFromURL(url, playwrightOptions);
             } else {
                 links = await this.extractor.extractFromURL(url, extractionOptions);
@@ -116,6 +143,8 @@ class RavPageLinks {
 
             if (this.logger) {
                 this.logger.info(`Encontradas ${links.length} URLs brutas`);
+            } else if (this.options.verbose) {
+                console.log(`📊 Encontradas ${links.length} URLs brutas`);
             }
 
             let filteredLinks = links;
@@ -124,6 +153,8 @@ class RavPageLinks {
                 filteredLinks = this.filterManager.applyFilters(links, filter);
                 if (this.logger) {
                     this.logger.info(`${filteredLinks.length} URLs após filtros`);
+                } else if (this.options.verbose) {
+                    console.log(`🔧 ${filteredLinks.length} URLs após filtros`);
                 }
             }
 
@@ -132,6 +163,8 @@ class RavPageLinks {
                 filteredLinks = [...new Set(filteredLinks)];
                 if (this.logger) {
                     this.logger.info(`${filteredLinks.length} URLs únicas (removidas ${before - filteredLinks.length} duplicatas)`);
+                } else if (this.options.verbose) {
+                    console.log(`✨ ${filteredLinks.length} URLs únicas (removidas ${before - filteredLinks.length} duplicatas)`);
                 }
             }
 
@@ -140,11 +173,16 @@ class RavPageLinks {
         } catch (error) {
             if (this.logger) {
                 this.logger.error(`Erro no crawling: ${error.message}`);
+            } else {
+                console.error(`❌ Erro no crawling: ${error.message}`);
             }
 
-            if (options.usePlaywright && !isAndroid) {
+            // 🆕 SÓ TENTA FALLBACK SE PLAYWRIGHT ESTIVER DISPONÍVEL
+            if (options.usePlaywright && this.playwrightCrawler) {
                 if (this.logger) {
                     this.logger.warn('Tentando fallback para extração HTML tradicional...');
+                } else if (this.options.verbose) {
+                    console.log('🔄 Tentando fallback para extração HTML tradicional...');
                 }
                 return await this.crawl(url, { ...options, usePlaywright: false });
             }
@@ -152,7 +190,6 @@ class RavPageLinks {
             throw error;
         }
     }
-
 
     /**
      * 🔒 Fecha recursos do Playwright
@@ -198,6 +235,33 @@ class RavPageLinks {
      */
     loadFiltersFromFile(filePath, type = 'domain') {
         return this.filterManager.loadFiltersFromFile(filePath, type);
+    }
+
+    /**
+     * 🆕 VERIFICA SE PLAYWRIGHT ESTÁ DISPONÍVEL
+     * @returns {boolean} ✅ True se Playwright estiver disponível
+     */
+    isPlaywrightAvailable() {
+        return !!this.playwrightCrawler;
+    }
+
+    /**
+     * 🆕 OBTÉM INFORMAÇÕES DA PLATAFORMA
+     * @returns {Object} 📋 Informações sobre recursos disponíveis
+     */
+    getPlatformInfo() {
+        const fs = require('fs');
+        const path = require('path');
+        const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '..', '.android-platform'));
+
+        return {
+            platform: process.platform,
+            isAndroid: isAndroid,
+            playwrightAvailable: !!this.playwrightCrawler,
+            features: this.playwrightCrawler ?
+                ['html-extraction', 'javascript-rendering', 'filtering', 'validation'] :
+                ['html-extraction', 'filtering', 'validation']
+        };
     }
 }
 

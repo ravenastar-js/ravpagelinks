@@ -220,9 +220,12 @@ ravpagelinks https://secguide.pages.dev/ferramentas --verbose --enable-logs
 ├── 📦 package.json
 ├── 📖 README.md
 ├── 🏠 index.js
+├── 🛠️ scripts/
+│   └── 📜 postinstall.js
 ├── ⚡ bin/
 │   └── 🖥️ cli.js
 ├── 📄 filtros.txt
+├── 📄 .android-platform     # gerado automaticamente
 └── 📁 src/
     ├── 🎯 core/
     │   ├── 🕷️ Crawler.js
@@ -236,7 +239,8 @@ ravpagelinks https://secguide.pages.dev/ferramentas --verbose --enable-logs
         └── 🔧 utils/
             ├── 📁 FileHandler.js
             ├── ✅ URLValidator.js
-            └── 📝 AdvancedLogger.js
+            ├── 📝 AdvancedLogger.js
+            └── 📝 Logger.js
 ```
 
 ### 🔄 Fluxo de Processamento
