@@ -16,16 +16,27 @@ const isAndroid = process.platform === 'android';
  * 🎯 Exibe banner visual da aplicação
  */
 function showBanner() {
+    const fs = require('fs');
+    const path = require('path');
+    const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '.android-platform'));
+
+    // 🆕 FONTE DIFERENCIADA POR PLATAFORMA
+    const fontConfig = isAndroid ? {
+        font: 'Small',           // 🆕 Fonte menor para Android
+        horizontalLayout: 'fitted',
+        verticalLayout: 'fitted'
+    } : {
+        font: 'Small Slant',     // 🆕 Fonte normal para outras plataformas
+        horizontalLayout: 'default',
+        verticalLayout: 'default'
+    };
+
     console.log(
         chalk.greenBright(
-            figlet.textSync('RavPageLinks', {
-                font: 'Small Slant',
-                horizontalLayout: 'default',
-                verticalLayout: 'default'
-            })
+            figlet.textSync('RavPageLinks', fontConfig)
         )
     );
-
+    
     const boxenOptions = {
         padding: 1,
         margin: 1,
@@ -283,8 +294,8 @@ async function main() {
         });
 
         const methodMsg = isAndroid ?
-            '📱 Método de extração: HTML tradicional (Android)' :
-            `🌐 Método de extração: ${finalUsePlaywright ? 'Playwright (renderização JavaScript)' : 'HTML tradicional'}`;
+            'Método de extração: HTML tradicional (Android)' :
+            `Método de extração: ${finalUsePlaywright ? 'Playwright (renderização JavaScript)' : 'HTML tradicional'}`;
 
         if (logger) {
             logger.info(methodMsg);
