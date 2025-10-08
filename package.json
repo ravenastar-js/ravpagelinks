@@ -8,6 +8,7 @@
     },
     "scripts": {
         "dev": "node bin/cli.js",
+        "postinstall": "node scripts/postinstall.js",
         "dw-nav": "playwright install"
     },
     "keywords": [
