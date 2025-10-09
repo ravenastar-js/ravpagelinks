@@ -1,6 +1,6 @@
 {
     "name": "ravpagelinks",
-    "version": "1.0.21",
+    "version": "1.0.22",
     "description": "🕷️ Ferramenta básica de Enumeração de URLs em Páginas Web.",
     "main": "index.js",
     "bin": {
@@ -12,11 +12,29 @@
         "dw-nav": "playwright install"
     },
     "keywords": [
-      "osint", "web-recon", "security-tools", "web-security",
-      "url-extraction", "url-enumerator", "url-enumeration", "urls", "links",
-      "scraping-tool", "crawler", "web-crawler", "automation", "dom-parser", "playwright",
-      "cli", "cli-tools", "tool", "tools", "Utility", "javascript",
-      "ravenastar", "ravpagelinks"
+        "osint",
+        "web-recon",
+        "security-tools",
+        "web-security",
+        "url-extraction",
+        "url-enumerator",
+        "url-enumeration",
+        "urls",
+        "links",
+        "scraping-tool",
+        "crawler",
+        "web-crawler",
+        "automation",
+        "dom-parser",
+        "playwright",
+        "cli",
+        "cli-tools",
+        "tool",
+        "tools",
+        "Utility",
+        "javascript",
+        "ravenastar",
+        "ravpagelinks"
     ],
     "author": "ravenastar-js",
     "license": "MIT",
