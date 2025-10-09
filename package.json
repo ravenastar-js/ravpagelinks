@@ -12,20 +12,11 @@
         "dw-nav": "playwright install"
     },
     "keywords": [
-        "osint",
-        "ravenastar",
-        "crawler",
-        "url-enumeration",
-        "dom",
-        "links",
-        "scraping",
-        "security",
-        "recon",
-        "axios",
-        "chalk",
-        "playwright",
-        "moment",
-        "boxen"
+      "osint", "web-recon", "security-tools", "web-security",
+      "url-extraction", "url-enumerator", "url-enumeration", "urls", "links",
+      "scraping-tool", "crawler", "web-crawler", "automation", "dom-parser", "playwright",
+      "cli", "cli-tools", "tool", "tools", "Utility", "javascript",
+      "ravenastar", "ravpagelinks"
     ],
     "author": "ravenastar-js",
     "license": "MIT",
