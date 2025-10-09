@@ -12,6 +12,8 @@
         "dw-nav": "playwright install"
     },
     "keywords": [
+        "osint",
+        "ravenastar",
         "crawler",
         "url-enumeration",
         "dom",
@@ -19,7 +21,6 @@
         "scraping",
         "security",
         "recon",
-        "ravenastar",
         "axios",
         "chalk",
         "playwright",
