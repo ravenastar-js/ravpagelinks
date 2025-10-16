@@ -1,0 +1,83 @@
+📦 GESTÃO DE PACOTES GLOBAIS
+================================
+Listar pacotes globais (formato simples): npm ls -g --parseable | ForEach-Object { Split-Path $_ -Leaf }
+Listar pacotes globais (detalhado): npm list -g --depth=0
+Verificar pacote específico: npm list -g nome-do-pacote
+Instalar pacote global: npm install -g nome-do-pacote
+Desinstalar pacote global: npm uninstall -g nome-do-pacote
+Atualizar pacote global: npm update -g nome-do-pacote
+
+🔍 INFORMAÇÕES E BUSCA
+================================
+Buscar pacotes: npm search termo-de-busca
+Ver informações do pacote: npm view nome-do-pacote
+Listar versões disponíveis: npm view nome-do-pacote versions
+Ver última versão: npm view nome-do-pacote version
+
+📁 GESTÃO DE PACOTES LOCAIS
+================================
+Instalar dependências: npm install
+Instalar pacote: npm install nome-do-pacote
+Instalar como dev dependency: npm install nome-do-pacote --save-dev
+Desinstalar pacote: npm uninstall nome-do-pacote
+Atualizar pacotes: npm update
+Verificar pacotes desatualizados: npm outdated
+
+🧹 LIMPEZA E MANUTENÇÃO
+================================
+Limpar cache npm: npm cache clean --force
+Verificar cache: npm cache verify
+Limpar node_modules: rm -rf node_modules (Linux/Mac) ou rmdir /s node_modules (Windows)
+Reinstalar tudo: npm ci
+
+🔄 VERSIONAMENTO E SCRIPTS
+================================
+Executar script: npm run nome-do-script
+Listar scripts disponíveis: npm run
+Aumentar versão patch: npm version patch
+Aumentar versão minor: npm version minor
+Aumentar versão major: npm version major
+
+🔗 LINKS E DESENVOLVIMENTO
+================================
+Criar link local: npm link
+Usar pacote linkado: npm link nome-do-pacote
+Remover link: npm unlink nome-do-pacote
+
+📊 AUDITORIA E SEGURANÇA
+================================
+Verificar vulnerabilidades: npm audit
+Corrigir vulnerabilidades: npm audit fix
+Corrigir automaticamente: npm audit fix --force
+Ignorar auditoria: npm install --no-audit
+
+⚙️ CONFIGURAÇÕES
+================================
+Ver configurações: npm config list
+Setar registry: npm config set registry https://registry.npmjs.org/
+Ver registry atual: npm config get registry
+Setar proxy: npm config set proxy http://proxy.company.com:8080
+
+🚀 INICIALIZAÇÃO E PUBLICAÇÃO
+================================
+Iniciar novo projeto: npm init
+Iniciar com padrões: npm init -y
+Login no registry: npm login
+Publicar pacote: npm publish
+Despublicar pacote: npm unpublish nome-do-pacote@versão
+
+🐭 COMANDOS ALTERNATIVOS/RÁPIDOS
+================================
+npm i → npm install
+npm i -g → npm install -g
+npm un → npm uninstall
+npm up → npm update
+npm t → npm test
+npm ls → npm list
+
+📋 VERIFICAÇÕES DO SISTEMA
+================================
+Versão do Node: node --version
+Versão do NPM: npm --version
+Localização global: npm root -g
+Localização cache: npm config get cache

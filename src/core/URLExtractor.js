@@ -1,12 +1,29 @@
 const axios = require('axios');
 const { JSDOM } = require('jsdom');
 const URLValidator = require('../lib/utils/URLValidator');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * 🕸️ Extrator de URLs de conteúdo HTML
  * @class
  */
 class URLExtractor {
+
+    /**
+ * 📦 Obtém versão do package.json
+ */
+    getVersion() {
+        try {
+            const packagePath = path.join(__dirname, '..', '..', 'package.json');
+            const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+            return packageData.version || '1.0.0';
+        } catch (error) {
+            return '1.0.0';
+        }
+    }
+
+
     /**
      * 🏗️ Construtor do URLExtractor
      * @constructor
@@ -17,9 +34,11 @@ class URLExtractor {
      * @param {number} options.maxRedirects - 🔄 Máximo de redirecionamentos
      */
     constructor(options = {}) {
+        this.version = this.getVersion();
+
         this.options = {
             timeout: 10000,
-            userAgent: 'Mozilla/5.0 (compatible; RavPageLinks/1.1.0)',
+            userAgent: `Mozilla/5.0 (compatible; RavPageLinks/${this.version})`,
             followRedirects: true,
             maxRedirects: 5,
             ...options

@@ -8,7 +8,10 @@
     },
     "scripts": {
         "dev": "node bin/cli.js",
-        "postinstall": "node scripts/postinstall.js",
+        "postinstall": "node scripts/auto-setup.js --silent",
+        "setup": "node scripts/auto-setup.js",
+        "clean": "node scripts/cleanup.js",
+        "clean:full": "npm run clean && rmdir /s node_modules 2>nul || rm -rf node_modules",
         "dw-nav": "playwright install"
     },
     "keywords": [

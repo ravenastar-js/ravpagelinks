@@ -1,8 +1,33 @@
+
+const fs = require('fs');
+const path = require('path');
+
 /**
  * 🌐 Validador e resolvedor de URLs
  * @class
  */
 class URLValidator {
+    /**
+ * 📦 Obtém versão do package.json
+ */
+    getVersion() {
+        try {
+            const packagePath = path.join(__dirname, '..', '..', '..', 'package.json');
+            const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+            return packageData.version || '1.0.0';
+        } catch (error) {
+            return '1.0.0';
+        }
+    }
+
+    /**
+     * 🔧 Construtor com versão dinâmica
+     */
+    constructor() {
+        this.version = this.getVersion();
+        this.userAgent = `Mozilla/5.0 (compatible; RavPageLinks/${this.version})`;
+    }
+
     /**
      * 🔗 Resolve URL relativa para absoluta
      * @param {string} url - 🌐 URL para resolver

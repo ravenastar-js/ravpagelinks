@@ -1,20 +1,47 @@
 const URLExtractor = require('./URLExtractor');
 const FilterManager = require('../lib/filters/FilterManager');
 const AdvancedLogger = require('../lib/utils/AdvancedLogger');
+const fs = require('fs');
+const path = require('path');
 
 // 🆕 CARREGAMENTO CONDICIONAL DO PLAYWRIGHT
 let PlaywrightCrawler = null;
+let PlaywrightFallback = null;
 let playwrightAvailable = false;
 
+/**
+ * 📦 Obtém versão do package.json
+ */
+function getVersion() {
+    try {
+        const packagePath = path.join(__dirname, '..', '..', 'package.json');
+        const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+        return packageData.version || '1.0.0';
+    } catch (error) {
+        return '1.0.0';
+    }
+}
+
 try {
-    // 🆕 Tenta carregar o Playwright apenas se não for Android
-    const fs = require('fs');
-    const path = require('path');
     const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '..', '.android-platform'));
 
     if (!isAndroid) {
-        PlaywrightCrawler = require('./PlaywrightCrawler');
-        playwrightAvailable = true;
+        try {
+            PlaywrightCrawler = require('./PlaywrightCrawler');
+
+            const playwrightCore = require('playwright-core');
+            const chromiumPath = playwrightCore.chromium.executablePath();
+
+            if (fs.existsSync(chromiumPath)) {
+                playwrightAvailable = true;
+            } else {
+                PlaywrightFallback = require('./PlaywrightFallback');
+                console.warn('🟡 Aviso: Navegadores do Playwright não encontrados. Use fallback ou execute: npx playwright install');
+            }
+        } catch (error) {
+            PlaywrightFallback = require('./PlaywrightFallback');
+            console.warn('🟡 Aviso: Playwright não disponível. Usando modo fallback.');
+        }
     }
 } catch (error) {
     console.warn('⚠️ Playwright não disponível:', error.message);
@@ -39,17 +66,16 @@ class RavPageLinks {
      * @param {boolean} options.enableLogs - 📝 Habilitar sistema de logs
      */
     constructor(options = {}) {
-        const fs = require('fs');
-        const path = require('path');
         const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '..', '.android-platform'));
+        const version = getVersion();
 
-        // 🆕 DETERMINA SE PLAYWRIGHT ESTÁ DISPONÍVEL
-        const canUsePlaywright = playwrightAvailable && !isAndroid;
+        // 🆕 DETERMINA SE PLAYWRIGHT ESTÁ DISPONÍVEL COM FALLBACK
+        const canUsePlaywright = (playwrightAvailable || PlaywrightFallback) && !isAndroid;
         const defaultUsePlaywright = canUsePlaywright;
 
         this.options = {
             timeout: 30000,
-            userAgent: 'Mozilla/5.0 (compatible; RavPageLinks/1.3.0)',
+            userAgent: `Mozilla/5.0 (compatible; RavPageLinks/${version})`,
             verbose: false,
             deepScan: true,
             usePlaywright: defaultUsePlaywright,
@@ -68,15 +94,28 @@ class RavPageLinks {
 
         this.extractor = new URLExtractor(this.options);
 
-        // 🆕 SÓ CRIA PLAYWRIGHT SE DISPONÍVEL E SOLICITADO
-        this.playwrightCrawler = (this.options.usePlaywright && PlaywrightCrawler) ?
-            new PlaywrightCrawler({
-                ...this.options,
-                ...this.options.playwrightOptions
-            }) : null;
+        // 🆕 SÓ CRIA PLAYWRIGHT SE DISPONÍVEL E SOLICITADO (COM FALLBACK)
+        if (this.options.usePlaywright) {
+            if (PlaywrightCrawler && playwrightAvailable) {
+                this.playwrightCrawler = new PlaywrightCrawler({
+                    ...this.options,
+                    ...this.options.playwrightOptions
+                });
+            } else if (PlaywrightFallback) {
+                this.playwrightCrawler = new PlaywrightFallback({
+                    ...this.options,
+                    ...this.options.playwrightOptions
+                });
+
+                if (this.options.verbose) {
+                    console.log('🟡 Usando fallback do Playwright - navegadores não disponíveis');
+                }
+            }
+        } else {
+            this.playwrightCrawler = null;
+        }
 
         this.filterManager = new FilterManager();
-
         this.logger = this.options.enableLogs ? new AdvancedLogger({
             verbose: this.options.verbose,
             colors: true,
@@ -86,14 +125,20 @@ class RavPageLinks {
         // 🆕 LOG INFORMATIVO SOBRE RECURSOS DISPONÍVEIS
         if (this.options.verbose) {
             const platformInfo = isAndroid ? '📱 Android' : process.platform;
-            const methodInfo = this.playwrightCrawler ?
-                '🌐 Playwright disponível' :
-                '🏗️ Apenas HTML tradicional';
+            let methodInfo = '🏗️ Apenas HTML tradicional';
+
+            if (this.playwrightCrawler) {
+                if (this.playwrightCrawler instanceof PlaywrightFallback) {
+                    methodInfo = '🌐 Playwright (fallback - navegadores não instalados)';
+                } else {
+                    methodInfo = '🌐 Playwright disponível';
+                }
+            }
 
             const logMsg = this.logger ?
                 this.logger.info.bind(this.logger) :
                 console.log;
-            logMsg(`${platformInfo} - ${methodInfo}`);
+            logMsg(`${platformInfo} - RavPageLinks v${version} - ${methodInfo}`);
         }
     }
 

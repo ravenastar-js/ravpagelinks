@@ -1,12 +1,27 @@
 const playwright = require('playwright');
 const URLValidator = require('../lib/utils/URLValidator');
 const AdvancedLogger = require('../lib/utils/AdvancedLogger');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * 🌐 Crawler usando Playwright para renderização JavaScript
  * @class
  */
 class PlaywrightCrawler {
+    /**
+ * 📦 Obtém versão do package.json
+ */
+    getVersion() {
+        try {
+            const packagePath = path.join(__dirname, '..', '..', 'package.json');
+            const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+            return packageData.version || '1.0.0';
+        } catch (error) {
+            return '1.0.0';
+        }
+    }
+
     /**
      * 🏗️ Construtor do PlaywrightCrawler
      * @constructor
@@ -20,13 +35,15 @@ class PlaywrightCrawler {
      * @param {string} options.browserType - 🌐 Tipo de navegador
      */
     constructor(options = {}) {
+        this.version = this.getVersion();
+
         this.options = {
             timeout: 30000,
             headless: true,
             waitUntil: 'networkidle',
             waitForTimeout: 5000,
             viewport: { width: 1280, height: 720 },
-            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+            userAgent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 RavPageLinks/${this.version}`,
             browserType: 'chromium',
             ...options
         };
