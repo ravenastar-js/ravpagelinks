@@ -226,7 +226,10 @@ class PlaywrightCrawler {
                 css: new Set(),
                 meta: new Set(),
                 events: new Set(),
-                json: new Set()
+                json: new Set(),
+                windowOpen: new Set(),
+                dataAttributes: new Set(),
+                dynamicContent: new Set()
             };
 
             const resolveURL = (url, baseUrl) => {
@@ -251,6 +254,53 @@ class PlaywrightCrawler {
                     return null;
                 }
             };
+
+            const extractFromEvent = (element, eventName) => {
+                try {
+                    const handler = element.getAttribute(eventName);
+                    if (handler && typeof handler === 'string') {
+                        const windowOpenMatch = handler.match(/window\.open\s*\(\s*['"`]([^'"`]+)['"`]/);
+                        if (windowOpenMatch && windowOpenMatch[1]) {
+                            const url = resolveURL(windowOpenMatch[1], base);
+                            if (url) results.windowOpen.add(url);
+                        }
+
+                        const urlMatches = handler.match(/(https?:\/\/[^\s"']+|\/[^\s"']+)/g) || [];
+                        urlMatches.forEach(match => {
+                            const resolved = resolveURL(match, base);
+                            if (resolved) results.events.add(resolved);
+                        });
+                    }
+                } catch (e) { }
+            };
+
+            const eventAttributes = [
+                'onclick', 'onload', 'onerror', 'onmouseover',
+                'ondblclick', 'onmousedown', 'onkeypress'
+            ];
+
+            eventAttributes.forEach(event => {
+                const elements = document.querySelectorAll(`[${event}]`);
+                elements.forEach(element => {
+                    extractFromEvent(element, event);
+                });
+            });
+
+            const dataAttrs = [
+                'data-href', 'data-url', 'data-src', 'data-link',
+                'data-action', 'data-target', 'data-load'
+            ];
+
+            dataAttrs.forEach(attr => {
+                const elements = document.querySelectorAll(`[${attr}]`);
+                elements.forEach(element => {
+                    const value = element.getAttribute(attr);
+                    if (value) {
+                        const url = resolveURL(value, base);
+                        if (url) results.dataAttributes.add(url);
+                    }
+                });
+            });
 
             try {
                 const linkElements = [
@@ -443,7 +493,10 @@ class PlaywrightCrawler {
                 css: Array.from(results.css),
                 meta: Array.from(results.meta),
                 events: Array.from(results.events),
-                json: Array.from(results.json)
+                json: Array.from(results.json),
+                windowOpen: Array.from(results.windowOpen),
+                dataAttributes: Array.from(results.dataAttributes),
+                dynamicContent: Array.from(results.dynamicContent)
             };
 
         }, baseURL);
@@ -455,7 +508,10 @@ class PlaywrightCrawler {
             ...extractedData.css,
             ...extractedData.meta,
             ...extractedData.events,
-            ...extractedData.json
+            ...extractedData.json,
+            ...extractedData.windowOpen,
+            ...extractedData.dataAttributes,
+            ...extractedData.dynamicContent
         ];
 
         allURLs.forEach(url => {

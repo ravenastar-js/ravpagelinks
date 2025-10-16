@@ -20,13 +20,12 @@ function showBanner() {
     const path = require('path');
     const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '.android-platform'));
 
-    // 🆕 FONTE DIFERENCIADA POR PLATAFORMA
     const fontConfig = isAndroid ? {
-        font: 'Small',           // 🆕 Fonte menor para Android
+        font: 'Small',
         horizontalLayout: 'fitted',
         verticalLayout: 'fitted'
     } : {
-        font: 'Small Slant',     // 🆕 Fonte normal para outras plataformas
+        font: 'Small Slant',
         horizontalLayout: 'default',
         verticalLayout: 'default'
     };
@@ -36,7 +35,7 @@ function showBanner() {
             figlet.textSync('RavPageLinks', fontConfig)
         )
     );
-    
+
     const boxenOptions = {
         padding: 1,
         margin: 1,
@@ -149,6 +148,11 @@ const argv = yargs(hideBin(process.argv))
         default: 'chromium',
         hidden: isAndroid
     })
+    .option('deep-js-scan', {
+        type: 'boolean',
+        description: '🔍 Varredura profunda em JavaScript e eventos',
+        default: true
+    })
     .option('log-dir', {
         type: 'string',
         description: '📂 Diretório para arquivos de log',
@@ -233,10 +237,10 @@ async function main() {
                 const warnMsg = `Arquivo de filtro não encontrado: ${filterFile}`;
                 if (logger) {
                     logger.warn(warnMsg);
-                    logger.info(`Criando arquivo de exemplo: ${chalk.blue(filterFile)}`);
+                    logger.blueBright(`Criando arquivo de exemplo: ${chalk.blue(filterFile)}`);
                 } else {
                     console.log(chalk.yellow('⚠️ ' + warnMsg));
-                    console.log(chalk.blue('📄 Criando arquivo de exemplo:'), filterFile);
+                    console.log(chalk.blueBright('📄 Criando arquivo de exemplo:'), filterFile);
                 }
                 FileHandler.createEmptyFilterFile(filterFile);
             }
@@ -313,6 +317,7 @@ async function main() {
             filter: filterConfig,
             unique: unique,
             usePlaywright: finalUsePlaywright,
+            deepJsScan: argv.deepJsScan,
             playwrightOptions: {
                 scrollToBottom: argv.scroll || false,
                 waitForTimeout: argv.waitTime || 5000

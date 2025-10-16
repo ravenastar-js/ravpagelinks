@@ -139,7 +139,7 @@ class URLExtractor {
                         this.processAttributeValue(value, baseURL, urls, attr, element.tagName);
                     }
                 });
-            } catch (error) {}
+            } catch (error) { }
         });
 
         const styleElements = document.querySelectorAll('[style]');
@@ -219,30 +219,216 @@ class URLExtractor {
         const events = [
             'onclick', 'onload', 'onerror', 'onmouseover', 'onmouseout',
             'onsubmit', 'onchange', 'onfocus', 'onblur', 'onresize',
-            'onscroll', 'onkeydown', 'onkeyup', 'onkeypress'
+            'onscroll', 'onkeydown', 'onkeyup', 'onkeypress',
+            'ondblclick', 'onmousedown', 'onmouseup', 'onmousemove'
         ];
 
         events.forEach(event => {
             const elements = document.querySelectorAll(`[${event}]`);
             elements.forEach(element => {
                 const handler = element.getAttribute(event);
-                const extractedUrls = this.validator.extractURLFromJavaScript(handler, baseURL);
-                extractedUrls.forEach(url => {
-                    if (url) urls.add(url);
-                });
+                if (handler) {
+                    const extractedUrls = this.extractAdvancedURLsFromJavaScript(handler, baseURL);
+                    extractedUrls.forEach(url => {
+                        if (url) urls.add(url);
+                    });
+                }
             });
         });
 
         const scripts = document.querySelectorAll('script');
         scripts.forEach(script => {
             if (script.textContent) {
-                const extractedUrls = this.validator.extractURLFromJavaScript(script.textContent, baseURL);
+                const extractedUrls = this.extractAdvancedURLsFromJavaScript(script.textContent, baseURL);
                 extractedUrls.forEach(url => {
                     if (url) urls.add(url);
                 });
             }
         });
+
+        this.extractFromDataAttributes(document, baseURL, urls);
     }
+
+    /**
+  * 🆕 Extração avançada de URLs em JavaScript
+  * @param {string} jsCode - 📜 Código JavaScript
+  * @param {string} baseURL - 🌐 URL base
+  * @returns {string[]} 📋 Array de URLs extraídas
+  */
+    extractAdvancedURLsFromJavaScript(jsCode, baseURL) {
+        if (!jsCode || typeof jsCode !== 'string') return [];
+
+        const urls = new Set();
+
+        const windowOpenPatterns = [
+            /window\.open\s*\(\s*['"`]([^'"`]+)['"`]/gi,
+            /window\.open\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*[^)]+\)/gi,
+            /open\s*\(\s*['"`]([^'"`]+)['"`]/gi
+        ];
+
+        const navigationPatterns = [
+            /window\.location\s*=\s*['"`]([^'"`]+)['"`]/gi,
+            /window\.location\.href\s*=\s*['"`]([^'"`]+)['"`]/gi,
+            /location\.href\s*=\s*['"`]([^'"`]+)['"`]/gi,
+            /location\.assign\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/gi,
+            /location\.replace\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/gi,
+            /document\.location\s*=\s*['"`]([^'"`]+)['"`]/gi
+        ];
+
+        const fetchPatterns = [
+            /fetch\s*\(\s*['"`]([^'"`]+)['"`]/gi,
+            /\.open\s*\(\s*['"`](?:GET|POST|PUT|DELETE)\s*,\s*['"`]([^'"`]+)['"`]/gi,
+            /axios\.(?:get|post|put|delete)\s*\(\s*['"`]([^'"`]+)['"`]/gi,
+            /\.get\s*\(\s*['"`]([^'"`]+)['"`]/gi,
+            /\.post\s*\(\s*['"`]([^'"`]+)['"`]/gi
+        ];
+
+        const assignmentPatterns = [
+            /\.(?:src|href|action|data|value)\s*=\s*['"`]([^'"`]+)['"`]/gi,
+            /setAttribute\s*\(\s*['"`](?:src|href|action)['"`]\s*,\s*['"`]([^'"`]+)['"`]\s*\)/gi
+        ];
+
+        const templatePatterns = [
+            /['"`](https?:\/\/[^'"`\s)]+)['"`]/gi,
+            /['"`](\/[^'"`\s)]+)['"`]/gi,
+            /['"`](\.\.?\/[^'"`\s)]+)['"`]/gi,
+            /`([^`]+)`/g
+        ];
+
+        const allPatterns = [
+            ...windowOpenPatterns,
+            ...navigationPatterns,
+            ...fetchPatterns,
+            ...assignmentPatterns,
+            ...templatePatterns
+        ];
+
+        allPatterns.forEach(pattern => {
+            let match;
+            while ((match = pattern.exec(jsCode)) !== null) {
+                const potentialURL = match[1] || match[0];
+                if (potentialURL && this.isValidJavaScriptURL(potentialURL)) {
+                    const url = this.validator.resolveURL(potentialURL, baseURL);
+                    if (url && this.validator.isValidURL(url)) {
+                        urls.add(url);
+                    }
+                }
+            }
+        });
+
+        const relativePathPattern = /window\.open\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*['"`](?:_blank|_self|_parent|_top)['"`]/gi;
+        let relativeMatch;
+        while ((relativeMatch = relativePathPattern.exec(jsCode)) !== null) {
+            const path = relativeMatch[1];
+            if (path && !path.startsWith('http') && !path.startsWith('javascript:')) {
+                const url = this.validator.resolveURL(path, baseURL);
+                if (url) urls.add(url);
+            }
+        }
+
+        return Array.from(urls);
+    }
+
+    /**
+       * 🆕 Valida se é uma URL válida em contexto JavaScript
+       * @param {string} url - 🌐 URL para validar
+       * @returns {boolean} ✅ True se for válida
+       */
+    isValidJavaScriptURL(url) {
+        if (!url || typeof url !== 'string') return false;
+
+        const invalidPatterns = [
+            'javascript:',
+            'mailto:',
+            'tel:',
+            '#',
+            'void(0)',
+            'void(0);',
+            'return false',
+            'return true',
+            'undefined',
+            'null'
+        ];
+
+        return !invalidPatterns.some(pattern =>
+            url.toLowerCase().includes(pattern.toLowerCase())
+        );
+    }
+
+    /**
+ * 🆕 Extrai URLs de atributos data-*
+ * @param {Document} document - 📄 Documento DOM
+ * @param {string} baseURL - 🌐 URL base
+ * @param {Set} urls - 🗂️ Set para armazenar URLs
+ */
+    extractFromDataAttributes(document, baseURL, urls) {
+        const dataAttributes = [
+            'data-href', 'data-url', 'data-src', 'data-link',
+            'data-action', 'data-target', 'data-load', 'data-open',
+            'data-ajax', 'data-form', 'data-image', 'data-video'
+        ];
+
+        dataAttributes.forEach(attr => {
+            const elements = document.querySelectorAll(`[${attr}]`);
+            elements.forEach(element => {
+                const value = element.getAttribute(attr);
+                if (value && typeof value === 'string') {
+                    if (this.looksLikeURL(value)) {
+                        const url = this.validator.resolveURL(value, baseURL);
+                        if (url && this.validator.isValidURL(url)) {
+                            urls.add(url);
+                        }
+                    }
+                }
+            });
+        });
+
+        const allDataElements = document.querySelectorAll('[data-]');
+        allDataElements.forEach(element => {
+            Array.from(element.attributes).forEach(attr => {
+                if (attr.name.startsWith('data-') && attr.value) {
+                    const urlMatches = attr.value.match(/(https?:\/\/[^\s"',]+|\/[^\s"',]+)/g) || [];
+                    urlMatches.forEach(match => {
+                        if (this.looksLikeURL(match)) {
+                            const url = this.validator.resolveURL(match, baseURL);
+                            if (url) urls.add(url);
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * 🆕 Verifica se uma string parece ser uma URL
+     * @param {string} str - 📝 String para verificar
+     * @returns {boolean} ✅ True se parecer URL
+     */
+    looksLikeURL(str) {
+        if (!str || typeof str !== 'string') return false;
+
+        const urlIndicators = [
+            /^https?:\/\//i,
+            /^\/\//,
+            /^\/[^\/\s]/,
+            /^\.\.?\//,
+            /\.[a-z]{2,6}(\/|$)/i,
+            /[a-z]+\.[a-z]+/i
+        ];
+
+        const nonURLIndicators = [
+            /^[{}()\[\]]/,
+            /^[0-9]+$/,
+            /^[#!?]/,
+            /^javascript:/i,
+            /^mailto:/i,
+            /^(true|false|null|undefined)$/i
+        ];
+
+        return urlIndicators.some(indicator => indicator.test(str)) &&
+            !nonURLIndicators.some(indicator => indicator.test(str));
+    }
+
 
     /**
      * 🎨 Extrai URLs de CSS
