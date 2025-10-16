@@ -202,30 +202,30 @@ async function main() {
         const deepJsScan = argv.deepJsScan !== false;
 
         if (!url) {
-            console.error(chalk.red('❌ URL é obrigatória'));
-            console.log(chalk.blueBright('\n💡 Use: ravpagelinks <url> [opções]'));
-            console.log(chalk.blueBright('   Exemplo: ravpagelinks https://exemplo.com'));
-            console.log(chalk.blueBright('   Para ajuda: ravpagelinks --help\n'));
+            console.error(chalk.hex('#ff7c7cff')('❌ URL é obrigatória'));
+            console.log(chalk.hex('#9fccffff')('\n💡 Use: ravpagelinks <url> [opções]'));
+            console.log(chalk.hex('#9fccffff')('   Exemplo: ravpagelinks https://exemplo.com'));
+            console.log(chalk.hex('#9fccffff')('   Para ajuda: ravpagelinks --help\n'));
             process.exit(1);
         }
 
         try {
             new URL(url);
         } catch (error) {
-            console.error(chalk.red(`❌ URL inválida: ${url}`));
+            console.error(chalk.hex('#ff7c7cff')(`❌ URL inválida: ${url}`));
             process.exit(1);
         }
 
         if (logger) {
-            logger.start(`Iniciando enumeração de URLs: ${chalk.blueBright(url)}`);
-            logger.file(`Diretório de saída: ${chalk.blueBright(outputDir)}`);
+            logger.start(`Iniciando enumeração de URLs: ${chalk.hex('#9fccffff')(url)}`);
+            logger.file(`Diretório de saída: ${chalk.hex('#9fccffff')(outputDir)}`);
             logger.time(`Timeout: ${chalk.yellowBright(timeout + 'ms')}`);
 
             if (isAndroid) {
                 logger.info('📱 Android detectado - Modo HTML tradicional');
             }
         } else {
-            console.log(chalk.white.bold('🚀 Iniciando enumeração de URLs:'), chalk.blueBright(url));
+            console.log(chalk.white.bold('🚀 Iniciando enumeração de URLs:'), chalk.hex('#9fccffff')(url));
         }
 
         let filterConfig = {};
@@ -243,7 +243,7 @@ async function main() {
                 const warnMsg = `Arquivo de filtro não encontrado: ${filterFile}`;
                 if (logger) {
                     logger.warn(warnMsg);
-                    logger.info(`Criando arquivo de exemplo: ${chalk.blueBright(filterFile)}`);
+                    logger.info(`Criando arquivo de exemplo: ${chalk.hex('#9fccffff')(filterFile)}`);
                 } else {
                     console.log(chalk.yellowBright('⚠️ ' + warnMsg));
                     console.log(chalk.greenBright(`📄 Criando arquivo de exemplo: ${filterFile}`));
@@ -313,7 +313,7 @@ async function main() {
         if (logger) {
             logger.info(methodMsg);
         } else {
-            console.log(chalk.blueBright(isAndroid ? '📱 ' : '🌐 ') + methodMsg);
+            console.log(chalk.hex('#9fccffff')(isAndroid ? '📱 ' : '🌐 ') + methodMsg);
         }
 
         if (!argv.noPlaywright && logger) {
@@ -359,11 +359,11 @@ async function main() {
         if (logger) {
             logger.separator();
             logger.stats('ESTATÍSTICAS DE EXTRAÇÃO');
-            logger.stats(`Total de URLs encontradas: ${chalk.blueBright(links.length)}`);
+            logger.stats(`Total de URLs encontradas: ${chalk.hex('#9fccffff')(links.length)}`);
             logger.stats(`Tempo de execução: ${chalk.yellowBright(duration + 'ms')}`);
             logger.stats(`Domínio analisado: ${chalk.greenBright(domain)}`);
-            logger.stats(`Página processada: ${chalk.blueBright(urlObj.pathname || '/')}`);
-            logger.stats(`Arquivo de saída: ${chalk.blueBright(outputFile)}`);
+            logger.stats(`Página processada: ${chalk.hex('#9fccffff')(urlObj.pathname || '/')}`);
+            logger.stats(`Arquivo de saída: ${chalk.hex('#9fccffff')(outputFile)}`);
 
             if (isAndroid) {
                 logger.stats(`Plataforma: ${chalk.yellowBright('Android - HTML Tradicional')}`);
@@ -375,7 +375,7 @@ async function main() {
 
             if (links.length > 0 && argv.verbose) {
                 logger.separator();
-                logger.info(`${chalk.blueBright('URLs de exemplo:')}`);
+                logger.info(`${chalk.hex('#9fccffff')('URLs de exemplo:')}`);
                 links.slice(0, 5).forEach((link, index) => {
                     logger.link(`${index + 1}. ${link}`);
                 });
@@ -385,14 +385,14 @@ async function main() {
             }
 
             logger.complete(`Enumeração de URLs concluída com sucesso!`);
-            logger.file(`URLs salvas em: ${chalk.blueBright(outputFile)}`);
+            logger.file(`URLs salvas em: ${chalk.hex('#9fccffff')(outputFile)}`);
             logger.endSession();
         } else {
             console.log(chalk.greenBright('✅ Enumeração de URLs concluída com sucesso!'));
             console.log(chalk.white.bold('📊 Estatísticas:'));
-            console.log(`   • URLs encontradas: ${chalk.blueBright(links.length)}`);
+            console.log(`   • URLs encontradas: ${chalk.hex('#9fccffff')(links.length)}`);
             console.log(`   • Tempo de execução: ${chalk.yellowBright(duration + 'ms')}`);
-            console.log(`   • Arquivo salvo: ${chalk.blueBright(outputFile)}`);
+            console.log(`   • Arquivo salvo: ${chalk.hex('#9fccffff')(outputFile)}`);
             if (isAndroid) {
                 console.log(`   • Plataforma: ${chalk.yellowBright('Android')}`);
             }
@@ -410,7 +410,7 @@ async function main() {
             }
             logger.endSession();
         } else {
-            console.error(chalk.red('❌ ' + errorMsg));
+            console.error(chalk.hex('#ff7c7cff')('❌ ' + errorMsg));
             if (argv.verbose) {
                 console.error(chalk.gray(error.stack));
             }

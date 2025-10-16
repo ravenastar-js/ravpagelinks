@@ -99,15 +99,15 @@ class AdvancedLogger {
         };
 
         const colors = {
-            info: chalk.cyanBright,
-            success: chalk.greenBright,
-            error: chalk.redBright,
+            info: chalk.hex('#9fccffff'),
+            success: chalk.hex('#68ff94'),
+            error: chalk.hex('#ff7c7cff'),
             warn: chalk.yellowBright,
             debug: chalk.hex('#ff9fcfff'),
             start: chalk.cyanBright.bold,
-            complete: chalk.greenBright.bold,
-            file: chalk.cyanBright,
-            link: chalk.cyanBright,
+            complete: chalk.hex('#68ff94').bold,
+            file: chalk.hex('#ff9fcfff'),
+            link: chalk.hex('#9fccffff'),
             time: chalk.yellowBright,
             filter: chalk.hex('#ff9fcfff'),
             stats: chalk.cyanBright.bold
