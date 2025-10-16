@@ -62,7 +62,7 @@ function showBanner() {
     console.log(boxen(welcomeText, boxenOptions));
 
     if (isAndroid) {
-        console.log(chalk.yellow('📱 Aviso: Executando em Android - Playwright desativado automaticamente'));
+        console.log(chalk.yellowBright('📱 Aviso: Executando em Android - Playwright desativado automaticamente'));
     }
 }
 
@@ -219,7 +219,7 @@ async function main() {
         if (logger) {
             logger.start(`Iniciando enumeração de URLs: ${chalk.cyan(url)}`);
             logger.file(`Diretório de saída: ${chalk.cyan(outputDir)}`);
-            logger.time(`Timeout: ${chalk.yellow(timeout + 'ms')}`);
+            logger.time(`Timeout: ${chalk.yellowBright(timeout + 'ms')}`);
 
             if (isAndroid) {
                 logger.info('📱 Android detectado - Modo HTML tradicional');
@@ -234,7 +234,7 @@ async function main() {
             filterConfig.type = 'file';
             filterConfig.value = filterFile;
             if (logger) {
-                logger.filter(`Usando arquivo de filtro: ${chalk.magenta(filterFile)}`);
+                logger.filter(`Usando arquivo de filtro: ${chalk.magentaBright(filterFile)}`);
             } else {
                 console.log(chalk.white.bold('🔧 Usando arquivo de filtro:'), chalk.magentaBright(filterFile));
             }
@@ -255,37 +255,37 @@ async function main() {
                 filterConfig.type = 'domain';
                 filterConfig.value = filterPattern;
                 if (logger) {
-                    logger.filter(`Filtro de domínio: ${chalk.magenta(filterPattern)}`);
+                    logger.filter(`Filtro de domínio: ${chalk.magentaBright(filterPattern)}`);
                 }
             } else if (filterType === 'regex') {
                 filterConfig.type = 'regex';
                 filterConfig.value = filterPattern;
                 if (logger) {
-                    logger.filter(`Filtro regex: ${chalk.magenta(filterPattern)}`);
+                    logger.filter(`Filtro regex: ${chalk.magentaBright(filterPattern)}`);
                 }
             } else {
                 if (filterPattern.includes('*') || filterPattern.startsWith('^')) {
                     filterConfig.type = 'regex';
                     filterConfig.value = filterPattern;
                     if (logger) {
-                        logger.filter(`Filtro regex detectado automaticamente: ${chalk.magenta(filterPattern)}`);
+                        logger.filter(`Filtro regex detectado automaticamente: ${chalk.magentaBright(filterPattern)}`);
                     }
                 } else {
                     filterConfig.type = 'domain';
                     filterConfig.value = filterPattern;
                     if (logger) {
-                        logger.filter(`Filtro de domínio detectado automaticamente: ${chalk.magenta(filterPattern)}`);
+                        logger.filter(`Filtro de domínio detectado automaticamente: ${chalk.magentaBright(filterPattern)}`);
                     }
                 }
             }
         }
 
         if (unique) {
-            const uniqueMsg = `Remoção de duplicatas: ${chalk.green('Habilitada')}`;
+            const uniqueMsg = `Remoção de duplicatas: ${chalk.greenBright('Habilitada')}`;
             if (logger) {
                 logger.info(uniqueMsg);
             } else {
-                console.log(chalk.green('✨ ' + uniqueMsg));
+                console.log(chalk.greenBright('✨ ' + uniqueMsg));
             }
         }
 
@@ -360,17 +360,17 @@ async function main() {
             logger.separator();
             logger.stats('ESTATÍSTICAS DE EXTRAÇÃO');
             logger.stats(`Total de URLs encontradas: ${chalk.cyan(links.length)}`);
-            logger.stats(`Tempo de execução: ${chalk.yellow(duration + 'ms')}`);
-            logger.stats(`Domínio analisado: ${chalk.green(domain)}`);
+            logger.stats(`Tempo de execução: ${chalk.yellowBright(duration + 'ms')}`);
+            logger.stats(`Domínio analisado: ${chalk.greenBright(domain)}`);
             logger.stats(`Página processada: ${chalk.cyan(urlObj.pathname || '/')}`);
             logger.stats(`Arquivo de saída: ${chalk.cyan(outputFile)}`);
 
             if (isAndroid) {
-                logger.stats(`Plataforma: ${chalk.yellow('Android - HTML Tradicional')}`);
+                logger.stats(`Plataforma: ${chalk.yellowBright('Android - HTML Tradicional')}`);
             }
 
             if (filterConfig.type) {
-                logger.stats(`Filtro aplicado: ${chalk.magenta(filterConfig.type + ' - ' + filterConfig.value)}`);
+                logger.stats(`Filtro aplicado: ${chalk.magentaBright(filterConfig.type + ' - ' + filterConfig.value)}`);
             }
 
             if (links.length > 0 && argv.verbose) {
@@ -397,7 +397,7 @@ async function main() {
                 console.log(`   • Plataforma: ${chalk.yellowBright('Android')}`);
             }
             if (filterConfig.type) {
-                console.log(`   • Filtro aplicado: ${chalk.magenta(filterConfig.type)}`);
+                console.log(`   • Filtro aplicado: ${chalk.magentaBright(filterConfig.type)}`);
             }
         }
 
@@ -440,7 +440,7 @@ process.on('SIGINT', () => {
         logger.error(interruptMsg);
         logger.endSession();
     } else {
-        console.log(chalk.yellow('⚠️ ' + interruptMsg));
+        console.log(chalk.yellowBright('⚠️ ' + interruptMsg));
     }
     process.exit(0);
 });

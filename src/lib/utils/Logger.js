@@ -29,7 +29,7 @@ class Logger {
      * @param {string} message - 📝 Mensagem de sucesso
      */
     success(message) {
-        console.log(chalk.green('✅ ') + message);
+        console.log(chalk.greenBright('✅ ') + message);
     }
 
     /**
@@ -45,7 +45,7 @@ class Logger {
      * @param {string} message - 📝 Mensagem de aviso
      */
     warn(message) {
-        console.log(chalk.yellow('⚠️ ') + message);
+        console.log(chalk.yellowBright('⚠️ ') + message);
     }
 
     /**
@@ -54,7 +54,7 @@ class Logger {
      */
     debug(message) {
         if (this.verbose) {
-            console.log(chalk.magenta('🐛 ') + chalk.gray(message));
+            console.log(chalk.yellowBright('🐛 ') + chalk.gray(message));
         }
     }
 }

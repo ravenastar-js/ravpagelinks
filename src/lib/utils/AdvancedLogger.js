@@ -99,19 +99,20 @@ class AdvancedLogger {
         };
 
         const colors = {
-            info: chalk.cyan,
-            success: chalk.green,
-            error: chalk.red,
-            warn: chalk.yellow,
-            debug: chalk.magenta,
-            start: chalk.cyan.bold,
-            complete: chalk.green.bold,
-            file: chalk.cyan,
-            link: chalk.cyan,
-            time: chalk.yellow,
-            filter: chalk.magenta,
-            stats: chalk.cyan.bold
+            info: chalk.cyanBright,
+            success: chalk.greenBright,
+            error: chalk.redBright,
+            warn: chalk.yellowBright,
+            debug: chalk.magentaBright,
+            start: chalk.cyanBright.bold,
+            complete: chalk.greenBright.bold,
+            file: chalk.cyanBright,
+            link: chalk.cyanBright,
+            time: chalk.yellowBright,
+            filter: chalk.magentaBright,
+            stats: chalk.cyanBright.bold
         };
+
 
         const icon = icons[type] || '⚪';
         const color = colors[type] || chalk.white;
