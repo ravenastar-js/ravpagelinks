@@ -159,12 +159,16 @@ class RavPageLinks {
             filter = null,
             unique = false,
             usePlaywright = this.options.usePlaywright,
+            deepJsScan = true, // 🆕 Valor padrão
             playwrightOptions = {},
             ...extractionOptions
         } = options;
 
-        // 🆕 VERIFICAÇÃO FINAL DE DISPONIBILIDADE
-        const finalUsePlaywright = usePlaywright && this.playwrightCrawler;
+        // 🆕 PASSA A OPÇÃO DEEP JS SCAN PARA O EXTRACTOR
+        const finalExtractionOptions = {
+            ...extractionOptions,
+            deepJsScan: deepJsScan
+        };
 
         try {
             if (this.logger) {
@@ -172,10 +176,16 @@ class RavPageLinks {
                 this.logger.info(finalUsePlaywright ?
                     '🌐 Usando Playwright para renderização JavaScript...' :
                     '🏗️ Usando extração HTML tradicional...');
+                if (deepJsScan) {
+                    this.logger.info('🔍 Varredura profunda em JavaScript habilitada');
+                }
             } else if (this.options.verbose) {
                 console.log(finalUsePlaywright ?
                     '🌐 Usando Playwright para renderização JavaScript...' :
                     '🏗️ Usando extração HTML tradicional...');
+                if (deepJsScan) {
+                    console.log('🔍 Varredura profunda em JavaScript habilitada');
+                }
             }
 
             let links;
@@ -183,7 +193,7 @@ class RavPageLinks {
             if (finalUsePlaywright) {
                 links = await this.playwrightCrawler.extractFromURL(url, playwrightOptions);
             } else {
-                links = await this.extractor.extractFromURL(url, extractionOptions);
+                links = await this.extractor.extractFromURL(url, finalExtractionOptions);
             }
 
             if (this.logger) {

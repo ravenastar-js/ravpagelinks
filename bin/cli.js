@@ -56,6 +56,7 @@ function showBanner() {
 }
 
 const argv = yargs(hideBin(process.argv))
+    .scriptName('ravpagelinks')  // 🆕 NOME CORRETO DO COMANDO
     .usage(`${chalk.cyan.bold('Uso:')} $0 <url> [opções]`)
     .command('$0 <url>', 'Extrai URLs de uma página web', (yargs) => {
         yargs.positional('url', {
@@ -111,42 +112,28 @@ const argv = yargs(hideBin(process.argv))
     })
     .option('no-playwright', {
         type: 'boolean',
-        description: isAndroid ?
-            '🚫 Playwright já desativado no Android' :
-            '🚫 Desabilita Playwright',
-        default: isAndroid
+        description: '🚫 Desabilita Playwright',
+        default: false
     })
     .option('headless', {
         type: 'boolean',
-        description: isAndroid ?
-            '🌙 Não disponível no Android' :
-            '🌙 Executa navegador em modo headless',
-        default: true,
-        hidden: isAndroid
+        description: '🌙 Executa navegador em modo headless',
+        default: true
     })
     .option('wait-time', {
         type: 'number',
-        description: isAndroid ?
-            '⏳ Não aplicável no Android' :
-            '⏳ Tempo de espera para carregamento JavaScript em ms',
-        default: 5000,
-        hidden: isAndroid
+        description: '⏳ Tempo de espera para carregamento JavaScript em ms',
+        default: 5000
     })
     .option('scroll', {
         type: 'boolean',
-        description: isAndroid ?
-            '📜 Não disponível no Android' :
-            '📜 Rola a página para carregar conteúdo lazy',
-        hidden: isAndroid
+        description: '📜 Rola a página para carregar conteúdo lazy'
     })
     .option('browser', {
         type: 'string',
         choices: ['chromium', 'firefox', 'webkit'],
-        description: isAndroid ?
-            '🌐 Não disponível no Android' :
-            '🌐 Navegador a ser usado pelo Playwright',
-        default: 'chromium',
-        hidden: isAndroid
+        description: '🌐 Navegador a ser usado pelo Playwright',
+        default: 'chromium'
     })
     .option('deep-js-scan', {
         type: 'boolean',
@@ -166,7 +153,7 @@ const argv = yargs(hideBin(process.argv))
     ])
     .help()
     .alias('help', 'h')
-    .version()
+    .version(getVersion())
     .alias('version', 'V')
     .argv;
 
@@ -197,11 +184,16 @@ async function main() {
         const unique = argv.unique || false;
         const timeout = argv.timeout || 30000;
         const userAgent = argv.userAgent;
+        const deepJsScan = argv.deepJsScan !== false;
 
         if (!url) {
             console.error(chalk.red('❌ URL é obrigatória'));
+            console.log(chalk.cyan('\n💡 Use: ravpagelinks <url> [opções]'));
+            console.log(chalk.cyan('   Exemplo: ravpagelinks https://exemplo.com'));
+            console.log(chalk.cyan('   Para ajuda: ravpagelinks --help\n'));
             process.exit(1);
         }
+
 
         try {
             new URL(url);
@@ -317,7 +309,7 @@ async function main() {
             filter: filterConfig,
             unique: unique,
             usePlaywright: finalUsePlaywright,
-            deepJsScan: argv.deepJsScan,
+            deepJsScan: deepJsScan,
             playwrightOptions: {
                 scrollToBottom: argv.scroll || false,
                 waitForTimeout: argv.waitTime || 5000
