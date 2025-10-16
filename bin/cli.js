@@ -10,15 +10,26 @@ const boxen = require('boxen').default;
 const figlet = require('figlet');
 const path = require('path');
 const fs = require('fs');
-const isAndroid = process.platform === 'android';
+
+/**
+ * 📦 Obtém versão do package.json
+ */
+function getVersion() {
+    try {
+        const packagePath = path.join(__dirname, '..', 'package.json');
+        const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+        return packageData.version || '1.0.0';
+    } catch (error) {
+        return '1.0.0';
+    }
+}
 
 /**
  * 🎯 Exibe banner visual da aplicação
  */
 function showBanner() {
-    const fs = require('fs');
-    const path = require('path');
     const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '.android-platform'));
+    const version = getVersion();
 
     const fontConfig = isAndroid ? {
         font: 'Small',
@@ -43,7 +54,7 @@ function showBanner() {
         borderColor: 'greenBright'
     };
 
-    const welcomeText = chalk.white.bold('🚀 Ferramenta de Enumeração de URLs\n\n') +
+    const welcomeText = chalk.white.bold(`🚀 RavPageLinks v${version}\n\n`) +
         chalk.white('📝 Extrai URLs de páginas web com renderização JavaScript\n') +
         chalk.white('🔧 Múltiplos métodos de extração e filtros\n') +
         chalk.white('📊 Logs opcionais e relatórios detalhados');
@@ -55,8 +66,12 @@ function showBanner() {
     }
 }
 
+// 🆕 OBTER VERSÃO ANTES DE CONFIGURAR O YARGS
+const currentVersion = getVersion();
+
+// 🆕 CONFIGURA O NOME DO COMANDO CORRETAMENTE
 const argv = yargs(hideBin(process.argv))
-    .scriptName('ravpagelinks')  // 🆕 NOME CORRETO DO COMANDO
+    .scriptName('ravpagelinks')
     .usage(`${chalk.cyan.bold('Uso:')} $0 <url> [opções]`)
     .command('$0 <url>', 'Extrai URLs de uma página web', (yargs) => {
         yargs.positional('url', {
@@ -153,7 +168,7 @@ const argv = yargs(hideBin(process.argv))
     ])
     .help()
     .alias('help', 'h')
-    .version(getVersion())
+    .version(currentVersion)
     .alias('version', 'V')
     .argv;
 
@@ -194,7 +209,6 @@ async function main() {
             process.exit(1);
         }
 
-
         try {
             new URL(url);
         } catch (error) {
@@ -229,10 +243,10 @@ async function main() {
                 const warnMsg = `Arquivo de filtro não encontrado: ${filterFile}`;
                 if (logger) {
                     logger.warn(warnMsg);
-                    logger.blueBright(`Criando arquivo de exemplo: ${chalk.blue(filterFile)}`);
+                    logger.info(`Criando arquivo de exemplo: ${chalk.blue(filterFile)}`);
                 } else {
                     console.log(chalk.yellow('⚠️ ' + warnMsg));
-                    console.log(chalk.blueBright('📄 Criando arquivo de exemplo:'), filterFile);
+                    console.log(chalk.blue('📄 Criando arquivo de exemplo:'), filterFile);
                 }
                 FileHandler.createEmptyFilterFile(filterFile);
             }
@@ -274,6 +288,9 @@ async function main() {
                 console.log(chalk.green('✨ ' + uniqueMsg));
             }
         }
+
+        // 🆕 Verificar se é Android
+        const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '.android-platform'));
         const finalUsePlaywright = !isAndroid && !argv.noPlaywright;
 
         crawler = new RavPageLinks({
