@@ -103,18 +103,18 @@ class AdvancedLogger {
             success: chalk.greenBright,
             error: chalk.redBright,
             warn: chalk.yellowBright,
-            debug: chalk.magentaBright,
+            debug: chalk.hex('#ff9fcfff'),
             start: chalk.cyanBright.bold,
             complete: chalk.greenBright.bold,
             file: chalk.cyanBright,
             link: chalk.cyanBright,
             time: chalk.yellowBright,
-            filter: chalk.magentaBright,
+            filter: chalk.hex('#ff9fcfff'),
             stats: chalk.cyanBright.bold
         };
 
 
-        const icon = icons[type] || '⚪';
+        const icon = icons[type] || '🟣';
         const color = colors[type] || chalk.white;
 
         return `${timestamp}${icon} ${color(message)}`;

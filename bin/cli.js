@@ -54,7 +54,7 @@ function showBanner() {
         borderColor: 'greenBright'
     };
 
-    const welcomeText = chalk.white.bold(`🚀 RavPageLinks v${version}\n\n`) +
+    const welcomeText = chalk.cyanBright(`🚀 RavPageLinks ${chalk.yellowBright('v'+version)}\n\n`) +
         chalk.white('📝 Extrai URLs de páginas web com renderização JavaScript\n') +
         chalk.white('🔧 Múltiplos métodos de extração e filtros\n') +
         chalk.white('📊 Logs opcionais e relatórios detalhados');
@@ -234,9 +234,9 @@ async function main() {
             filterConfig.type = 'file';
             filterConfig.value = filterFile;
             if (logger) {
-                logger.filter(`Usando arquivo de filtro: ${chalk.magentaBright(filterFile)}`);
+                logger.filter(`Usando arquivo de filtro: ${chalk.hex('#ff9fcfff')(filterFile)}`);
             } else {
-                console.log(chalk.white.bold('🔧 Usando arquivo de filtro:'), chalk.magentaBright(filterFile));
+                console.log(chalk.white.bold('🔧 Usando arquivo de filtro:'), chalk.hex('#ff9fcfff')(filterFile));
             }
 
             if (!fs.existsSync(filterFile)) {
@@ -255,26 +255,26 @@ async function main() {
                 filterConfig.type = 'domain';
                 filterConfig.value = filterPattern;
                 if (logger) {
-                    logger.filter(`Filtro de domínio: ${chalk.magentaBright(filterPattern)}`);
+                    logger.filter(`Filtro de domínio: ${chalk.hex('#ff9fcfff')(filterPattern)}`);
                 }
             } else if (filterType === 'regex') {
                 filterConfig.type = 'regex';
                 filterConfig.value = filterPattern;
                 if (logger) {
-                    logger.filter(`Filtro regex: ${chalk.magentaBright(filterPattern)}`);
+                    logger.filter(`Filtro regex: ${chalk.hex('#ff9fcfff')(filterPattern)}`);
                 }
             } else {
                 if (filterPattern.includes('*') || filterPattern.startsWith('^')) {
                     filterConfig.type = 'regex';
                     filterConfig.value = filterPattern;
                     if (logger) {
-                        logger.filter(`Filtro regex detectado automaticamente: ${chalk.magentaBright(filterPattern)}`);
+                        logger.filter(`Filtro regex detectado automaticamente: ${chalk.hex('#ff9fcfff')(filterPattern)}`);
                     }
                 } else {
                     filterConfig.type = 'domain';
                     filterConfig.value = filterPattern;
                     if (logger) {
-                        logger.filter(`Filtro de domínio detectado automaticamente: ${chalk.magentaBright(filterPattern)}`);
+                        logger.filter(`Filtro de domínio detectado automaticamente: ${chalk.hex('#ff9fcfff')(filterPattern)}`);
                     }
                 }
             }
@@ -370,7 +370,7 @@ async function main() {
             }
 
             if (filterConfig.type) {
-                logger.stats(`Filtro aplicado: ${chalk.magentaBright(filterConfig.type + ' - ' + filterConfig.value)}`);
+                logger.stats(`Filtro aplicado: ${chalk.hex('#ff9fcfff')(filterConfig.type + ' - ' + filterConfig.value)}`);
             }
 
             if (links.length > 0 && argv.verbose) {
@@ -397,7 +397,7 @@ async function main() {
                 console.log(`   • Plataforma: ${chalk.yellowBright('Android')}`);
             }
             if (filterConfig.type) {
-                console.log(`   • Filtro aplicado: ${chalk.magentaBright(filterConfig.type)}`);
+                console.log(`   • Filtro aplicado: ${chalk.hex('#ff9fcfff')(filterConfig.type)}`);
             }
         }
 
