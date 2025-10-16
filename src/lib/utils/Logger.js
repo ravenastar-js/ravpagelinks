@@ -20,7 +20,7 @@ class Logger {
      */
     info(message) {
         if (this.verbose) {
-            console.log(chalk.blue('ℹ️ ') + chalk.gray(message));
+            console.log(chalk.cyan('ℹ️ ') + chalk.gray(message));
         }
     }
 

@@ -104,13 +104,13 @@ class AdvancedLogger {
             error: chalk.red,
             warn: chalk.yellow,
             debug: chalk.magenta,
-            start: chalk.blue.bold,
+            start: chalk.cyan.bold,
             complete: chalk.green.bold,
-            file: chalk.blue,
+            file: chalk.cyan,
             link: chalk.cyan,
             time: chalk.yellow,
             filter: chalk.magenta,
-            stats: chalk.blue.bold
+            stats: chalk.cyan.bold
         };
 
         const icon = icons[type] || '⚪';

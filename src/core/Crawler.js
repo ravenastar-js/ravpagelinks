@@ -4,7 +4,7 @@ const AdvancedLogger = require('../lib/utils/AdvancedLogger');
 const fs = require('fs');
 const path = require('path');
 
-// 🆕 CARREGAMENTO CONDICIONAL DO PLAYWRIGHT
+// 🆕 CARREGAMENTO CONDICIONAL DO PLAYWRIGHT COM FALLBACK
 let PlaywrightCrawler = null;
 let PlaywrightFallback = null;
 let playwrightAvailable = false;
@@ -28,10 +28,10 @@ try {
     if (!isAndroid) {
         try {
             PlaywrightCrawler = require('./PlaywrightCrawler');
-
+            
             const playwrightCore = require('playwright-core');
             const chromiumPath = playwrightCore.chromium.executablePath();
-
+            
             if (fs.existsSync(chromiumPath)) {
                 playwrightAvailable = true;
             } else {
@@ -57,13 +57,6 @@ class RavPageLinks {
      * 🏗️ Construtor da classe RavPageLinks
      * @constructor
      * @param {Object} options - Configurações do crawler
-     * @param {number} options.timeout - ⏰ Timeout das requisições
-     * @param {string} options.userAgent - 👤 User-Agent personalizado
-     * @param {boolean} options.verbose - 📢 Modo verboso
-     * @param {boolean} options.deepScan - 🔍 Escaneamento profundo
-     * @param {boolean} options.usePlaywright - 🌐 Usar Playwright
-     * @param {Object} options.playwrightOptions - ⚙️ Opções do Playwright
-     * @param {boolean} options.enableLogs - 📝 Habilitar sistema de logs
      */
     constructor(options = {}) {
         const isAndroid = process.platform === 'android' || fs.existsSync(path.join(__dirname, '..', '..', '.android-platform'));
@@ -106,7 +99,7 @@ class RavPageLinks {
                     ...this.options,
                     ...this.options.playwrightOptions
                 });
-
+                
                 if (this.options.verbose) {
                     console.log('🟡 Usando fallback do Playwright - navegadores não disponíveis');
                 }
@@ -126,9 +119,9 @@ class RavPageLinks {
         if (this.options.verbose) {
             const platformInfo = isAndroid ? '📱 Android' : process.platform;
             let methodInfo = '🏗️ Apenas HTML tradicional';
-
+            
             if (this.playwrightCrawler) {
-                if (this.playwrightCrawler instanceof PlaywrightFallback) {
+                if (this.playwrightCrawler.constructor.name === 'PlaywrightFallback') {
                     methodInfo = '🌐 Playwright (fallback - navegadores não instalados)';
                 } else {
                     methodInfo = '🌐 Playwright disponível';
@@ -150,6 +143,7 @@ class RavPageLinks {
      * @param {Object} options.filter - 🔍 Filtro a ser aplicado
      * @param {boolean} options.unique - ✨ Remover duplicatas
      * @param {boolean} options.usePlaywright - 🌐 Usar Playwright
+     * @param {boolean} options.deepJsScan - 🔍 Varredura profunda em JS
      * @param {Object} options.playwrightOptions - ⚙️ Opções do Playwright
      * @returns {Promise<string[]>} 📋 Array de URLs extraídas
      * @throws {Error} ❌ Erro durante o crawling
@@ -159,10 +153,13 @@ class RavPageLinks {
             filter = null,
             unique = false,
             usePlaywright = this.options.usePlaywright,
-            deepJsScan = true, // 🆕 Valor padrão
+            deepJsScan = true,
             playwrightOptions = {},
             ...extractionOptions
         } = options;
+
+        // 🆕 DEFINE finalUsePlaywright AQUI (ANTES DE SER USADA)
+        const finalUsePlaywright = usePlaywright && this.playwrightCrawler;
 
         // 🆕 PASSA A OPÇÃO DEEP JS SCAN PARA O EXTRACTOR
         const finalExtractionOptions = {

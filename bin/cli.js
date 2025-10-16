@@ -218,7 +218,7 @@ async function main() {
 
         if (logger) {
             logger.start(`Iniciando enumeração de URLs: ${chalk.cyan(url)}`);
-            logger.file(`Diretório de saída: ${chalk.blue(outputDir)}`);
+            logger.file(`Diretório de saída: ${chalk.cyan(outputDir)}`);
             logger.time(`Timeout: ${chalk.yellow(timeout + 'ms')}`);
 
             if (isAndroid) {
@@ -243,10 +243,10 @@ async function main() {
                 const warnMsg = `Arquivo de filtro não encontrado: ${filterFile}`;
                 if (logger) {
                     logger.warn(warnMsg);
-                    logger.info(`Criando arquivo de exemplo: ${chalk.blue(filterFile)}`);
+                    logger.info(`Criando arquivo de exemplo: ${chalk.cyan(filterFile)}`);
                 } else {
-                    console.log(chalk.yellow('⚠️ ' + warnMsg));
-                    console.log(chalk.blue('📄 Criando arquivo de exemplo:'), filterFile);
+                    console.log(chalk.yellowBright('⚠️ ' + warnMsg));
+                    console.log(chalk.greenBright(`📄 Criando arquivo de exemplo: ${filterFile}`));
                 }
                 FileHandler.createEmptyFilterFile(filterFile);
             }
@@ -362,8 +362,8 @@ async function main() {
             logger.stats(`Total de URLs encontradas: ${chalk.cyan(links.length)}`);
             logger.stats(`Tempo de execução: ${chalk.yellow(duration + 'ms')}`);
             logger.stats(`Domínio analisado: ${chalk.green(domain)}`);
-            logger.stats(`Página processada: ${chalk.blue(urlObj.pathname || '/')}`);
-            logger.stats(`Arquivo de saída: ${chalk.blue(outputFile)}`);
+            logger.stats(`Página processada: ${chalk.cyan(urlObj.pathname || '/')}`);
+            logger.stats(`Arquivo de saída: ${chalk.cyan(outputFile)}`);
 
             if (isAndroid) {
                 logger.stats(`Plataforma: ${chalk.yellow('Android - HTML Tradicional')}`);
@@ -385,16 +385,16 @@ async function main() {
             }
 
             logger.complete(`Enumeração de URLs concluída com sucesso!`);
-            logger.file(`URLs salvas em: ${chalk.blue(outputFile)}`);
+            logger.file(`URLs salvas em: ${chalk.cyan(outputFile)}`);
             logger.endSession();
         } else {
             console.log(chalk.greenBright('✅ Enumeração de URLs concluída com sucesso!'));
             console.log(chalk.white.bold('📊 Estatísticas:'));
             console.log(`   • URLs encontradas: ${chalk.cyan(links.length)}`);
-            console.log(`   • Tempo de execução: ${chalk.yellow(duration + 'ms')}`);
+            console.log(`   • Tempo de execução: ${chalk.yellowBright(duration + 'ms')}`);
             console.log(`   • Arquivo salvo: ${chalk.cyan(outputFile)}`);
             if (isAndroid) {
-                console.log(`   • Plataforma: ${chalk.yellow('Android')}`);
+                console.log(`   • Plataforma: ${chalk.yellowBright('Android')}`);
             }
             if (filterConfig.type) {
                 console.log(`   • Filtro aplicado: ${chalk.magenta(filterConfig.type)}`);
